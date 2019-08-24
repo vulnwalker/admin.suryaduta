@@ -69,48 +69,25 @@ class refCopywritingObj extends configClass
         $content = '';
         $json    = TRUE;
 
-        if (empty($namaMember)) {
-            $err = "Isi Nama ";
-        } elseif (empty($emailMember)) {
-            $err = "Isi Email";
-        } elseif (empty($alamatMember)) {
-            $err = "Isi Alamat";
-        } elseif (empty($teleponMember)) {
-            $err = "Isi Telepon";
-        } elseif (sqlRowCount(sqlQuery("select * from copy_writing where email='$emailMember'")) !=0) {
-            $err = "Email sudah terdaftar";
+        if (empty($judulCopywriting)) {
+            $err = "Isi Judul ";
+        } elseif (empty($isiContent)) {
+            $err = "Isi Content";
+        } elseif (empty($statusContent)) {
+            $err = "Pilih status ";
         }
 
         if ($err == '') {
 
             $dataInsert  = array(
-                'nama' => $namaMember,
-                'email' => $emailMember,
-                'alamat' => $alamatMember,
-                'nomor_telepon' => $teleponMember,
-                'nama_bank' => $namaBank,
-                'nomor_rekening' => $nomorRekening,
-                'nama_rekening' => $namaRekening,
-                'upline_level_1' => "0",
-                'upline_level_2' => "0",
-                'upline_level_3' => "0",
-                'upline_level_4' => "0",
-                'tanggal_join' => date("Y-m-d"),
-                'lisensi' => "BASIC",
+                'id_produk' => $idProduk,
+                'judul' => $judulCopywriting,
+                'isi_content' => $isiContent,
+                'tanggal' => date("Y-m-d"),
+                'status' => $statusContent,
             );
             $queryInsert = sqlInsert('copy_writing', $dataInsert);
             sqlQuery($queryInsert);
-
-            $getIdMember = sqlArray(sqlQuery("select max(id) from copy_writing where email='$emailMember'"));
-            $dataUsers = array(
-              "id_copy_writing" => $getIdMember['max(id)'],
-              "email" => $emailMember,
-              "password" => md5("123456"),
-              "status" => "AKTIF",
-              "hak_akses" => "MEMBER",
-              "online" => "0",
-            );
-            sqlQuery(sqlInsert("users",$dataUsers));
 
             $cek = $queryInsert;
         }
@@ -135,23 +112,20 @@ class refCopywritingObj extends configClass
 
         $fmST  = $_REQUEST[$this->Prefix . '_fmST'];
         $idplh = $_REQUEST[$this->Prefix . '_idplh'];
-        if (empty($namaMember)) {
-            $err = "Isi Nama ";
-        } elseif (empty($alamatMember)) {
-            $err = "Isi Alamat";
-        } elseif (empty($teleponMember)) {
-            $err = "Isi Telepon";
+        if (empty($judulCopywriting)) {
+            $err = "Isi Judul ";
+        } elseif (empty($isiContent)) {
+            $err = "Isi Content";
+        } elseif (empty($statusContent)) {
+            $err = "Pilih status ";
         }
-
         if ($err == '') {
           $dataUpdate  = array(
-              'nama' => $namaMember,
-              'alamat' => $alamatMember,
-              'nomor_telepon' => $teleponMember,
-              'nama_bank' => $namaBank,
-              'nomor_rekening' => $nomorRekening,
-              'nama_rekening' => $namaRekening,
-              'lisensi' => $lisensiMember,
+              'id_produk' => $idProduk,
+              'judul' => $judulCopywriting,
+              'isi_content' => $isiContent,
+              'tanggal' => date("Y-m-d"),
+              'status' => $statusContent,
           );
 
           $queryUpdate = sqlUpdate('copy_writing', $dataUpdate,"id = '$idEdit'");
@@ -267,11 +241,24 @@ class refCopywritingObj extends configClass
         $this->form_caption = 'Baru';
         // $idEdit             = $_REQUEST[$this->Prefix . '_cb'];
 
+        $arrayStatus = array(
+          array("AKTIF","AKTIF"),
+          array("TIDAK AKTIF","TIDAK AKTIF"),
+        );
+        $comboStatus = cmbArray('statusContent', $statusContent, $arrayStatus, '-- STATUS --', "");
+
+        $comboProduk = cmbQuery("idProduk",$idProduk, "select id, nama_produk from produk"," class ='form-control'"," -- PRODUK --");
         $fieldInform       .=  $this->newRow(array(
                                 $this->textBoxColumn('Judul','judulCopywriting',$judulCopywriting,'12','1','11'),
                                ));
         $fieldInform       .=  $this->newRow(array(
                                 $this->textAreaBoxColumn('Isi','isiContent',$isiContent,'12','1','11', "  style='height:300px;'"),
+                               ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Produk',$comboProduk,'12','1','11'),
+                               ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Status',$comboStatus,'12','1','11'),
                                ));
 
 
@@ -304,36 +291,26 @@ class refCopywritingObj extends configClass
         // $this->form_height  = 400;
         $this->form_caption = 'Edit';
         $idEdit             = $_REQUEST[$this->Prefix . '_cb'];
-        $getDataMember = sqlArray(sqlQuery("select * from copy_writing where id = '".$idEdit[0]."'"));
+        $getDataEdit = sqlArray(sqlQuery("select * from copy_writing where id = '".$idEdit[0]."'"));
 
+        $arrayStatus = array(
+          array("AKTIF","AKTIF"),
+          array("TIDAK AKTIF","TIDAK AKTIF"),
+        );
+        $comboStatus = cmbArray('statusContent', $getDataEdit['status'], $arrayStatus, '-- STATUS --', "");
+
+        $comboProduk = cmbQuery("idProduk",$getDataEdit['id_produk'], "select id, nama_produk from produk"," class ='form-control'"," -- PRODUK --");
         $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Nama','namaMember',$getDataMember['nama'],'12','1','11'),
+                                $this->textBoxColumn('Judul','judulCopywriting',$getDataEdit['judul'],'12','1','11'),
                                ));
         $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Email','emailMember',$getDataMember['email'],'12','1','11','readonly'),
+                                $this->textAreaBoxColumn('Isi','isiContent',$getDataEdit['isi_content'],'12','1','11', "  style='height:300px;'"),
                                ));
         $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Telepon','teleponMember',$getDataMember['nomor_telepon'],'12','1','11'),
+                                $this->customColumn('Produk',$comboProduk,'12','1','11'),
                                ));
         $fieldInform       .=  $this->newRow(array(
-                                $this->textAreaBoxColumn('Alamat','alamatMember',$getDataMember['alamat'],'12','1','11'),
-                               ));
-        $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Nama Bank','namaBank',$getDataMember['nama_bank'],'12','1','11'),
-                               ));
-        $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Nomor Rekening','nomorRekening',$getDataMember['nomor_rekening'],'12','1','11'),
-                               ));
-        $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('A/N Rekening','namaRekening',$getDataMember['nama_rekening'],'12','1','11'),
-                               ));
-                               $arrayLisensi = array(
-                                 array("BASIC","BASIC"),
-                                 array("AGEN","AGEN"),
-                                 array("STOKIS","STOKIS"),
-                               );
-        $fieldInform       .=  $this->newRow(array(
-                                $this->customColumn('Lisensi',cmbArray('lisensiMember', $getDataMember['lisensi'], $arrayLisensi, '-- LISENSI --', ""),'12','1','11'),
+                                $this->customColumn('Status',$comboStatus,'12','1','11'),
                                ));
 
         $this->form_fields =  "<div class='FilterBar row' style='padding: 1%;margin-top:5px;'>".$fieldInform."</div>";
@@ -433,9 +410,10 @@ class refCopywritingObj extends configClass
             'align="left" valign="middle"',
             $status
         );
+        $getNamaProduk = sqlArray(sqlQuery("select * from produk where id = '$id_produk'"));
         $Koloms[] = array(
             'align="left" valign="middle"',
-            $namaProduk
+            $getNamaProduk['nama_produk']
         );
 
 
@@ -454,24 +432,24 @@ class refCopywritingObj extends configClass
         if (empty($jumlahData)){
           $jumlahData = 50;
         }
+
         // $this->textBoxColumn('title','id','value','col_field','col_label','col_input');
         $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Nama','filterNama',$filterNama,'4','5','7'),
-                                $this->textBoxColumn('Email','filterEmail',$filterEmail,'4','5','7'),
+                                $this->textBoxColumn('Judul','filterJudul',$filterJudul,'4','5','7'),
+                                // $this->textBoxColumn('Isi','filterIsi',$filter,'4','5','7'),
                                ));
-        $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Nomor Telepon','filterNomorTelepon',$filterNomorTelepon,'4','5','7'),
-                                $this->textBoxColumn('Alamat','filterAlamat',$filterAlamat,'4','5','7'),
-                               ));
-                               $arrayLisensi = array(
-                                 array("BASIC","BASIC"),
-                                 array("AGEN","AGEN"),
-                                 array("STOKIS","STOKIS"),
+                               $arrayStatus = array(
+                                 array("AKTIF","AKTIF"),
+                                 array("TIDAK AKTIF","TIDAK AKTIF"),
                                );
-        $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Nama Bank','filterNamaBank',$filterNamaBank,'4','5','7'),
-                                $this->customColumn('Lisensi',cmbArray('filterLisensi', $filterLisensi, $arrayLisensi, '-- LISENSI --', ""),'4','5','7'),
-                               ));
+                               $comboStatus = cmbArray('filterStatus', $filterStatus, $arrayStatus, '-- STATUS --', "");
+
+                               $comboProduk = cmbQuery("filterProduk",$filterProduk, "select id, nama_produk from produk"," class ='form-control'"," -- PRODUK --");
+       $fieldInform        .=  $this->newRow(array(
+                               $this->customColumn('Produk',$comboProduk,'4','5','7'),
+                               $this->customColumn('Status',$comboStatus,'4','5','7'),
+                              ));
+
 
 
         $TampilOpt         =
@@ -517,23 +495,14 @@ class refCopywritingObj extends configClass
             $$key = $value;
         }
         $arrKondisi = array();
-        if (!empty($filterNama)) {
-            $arrKondisi[] = "nama like '%$filterNama%'";
+        if (!empty($filterJudul)) {
+            $arrKondisi[] = "judul like '%$filterJudul%'";
         }
-        if (!empty($filterEmail)) {
-            $arrKondisi[] = "email like '%$filterEmail%'";
+        if (!empty($filterStatus)) {
+            $arrKondisi[] = "status ='$filterStatus'";
         }
-        if (!empty($filterNomorTelepon)) {
-            $arrKondisi[] = "nomor_telepon like '%$filterNomorTelepon%'";
-        }
-        if (!empty($filterAlamat)) {
-            $arrKondisi[] = "alamat like '%$filterAlamat%'";
-        }
-        if (!empty($filterNamaBank)) {
-            $arrKondisi[] = "nama_bank like '%$filterNamaBank%'";
-        }
-        if (!empty($filterLisensi)) {
-            $arrKondisi[] = "lisensi ='$filterLisensi'";
+        if (!empty($filterProduk)) {
+            $arrKondisi[] = "id_produk ='$filterProduk'";
         }
 
 

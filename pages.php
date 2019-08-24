@@ -20,6 +20,17 @@ if (CekLogin () == false){
 
 
     switch ($Pg) {
+			case 'dashboard':{
+				if (CekLogin()) {  setLastAktif();
+					include('common/daftarobj.php');
+					include('common/configClass.php');
+					include("pages/dashboard.php");
+					$dashboard->selector();
+				}else{
+					header("Location:index.php?");
+				}
+				break;
+			}
 			case 'refMember':{
 				if (CekLogin()) {  setLastAktif();
 					include('common/daftarobj.php');
@@ -48,6 +59,17 @@ if (CekLogin () == false){
 					include('common/configClass.php');
 					include("pages/refCopywriting/refCopywriting.php");
 					$refCopywriting->selector();
+				}else{
+					header("Location:index.php?");
+				}
+				break;
+			}
+			case 'refFunnel':{
+				if (CekLogin()) {  setLastAktif();
+					include('common/daftarobj.php');
+					include('common/configClass.php');
+					include("pages/refFunnel/refFunnel.php");
+					$refFunnel->selector();
 				}else{
 					header("Location:index.php?");
 				}

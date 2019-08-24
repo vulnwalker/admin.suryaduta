@@ -1,8 +1,8 @@
 <?php
 
-class dashboardObj extends configClass
+class refFunnelObj extends configClass
 {
-    var $Prefix = 'dashboard';
+    var $Prefix = 'refFunnel';
     var $elCurrPage = "HalDefault";
     var $SHOW_CEK = TRUE;
     var $TblName = 'funnel'; //bonus
@@ -20,20 +20,20 @@ class dashboardObj extends configClass
     var $PageIcon = 'images/administrasi_ico.png';
     var $pagePerHal = '';
     //var $cetak_xls=TRUE ;
-    var $fileNameExcel = 'dashboard.xls';
+    var $fileNameExcel = 'refFunnel.xls';
     var $namaModulCetak = 'ADMINISTRASI';
     var $Cetak_Judul = 'funnel Produk';
     var $Cetak_Mode = 2;
     var $Cetak_WIDTH = '30cm';
     var $Cetak_OtherHTMLHead;
-    var $FormName = 'dashboardForm';
+    var $FormName = 'refFunnelForm';
     var $noModul = 14;
     var $TampilFilterColapse = 0; //0
     var $userName = ''; //0
 
     function setTitle()
     {
-        return 'Dashboard';
+        return 'Funnel';
     }
 
     function filterSaldoMiring()
@@ -210,23 +210,6 @@ class dashboardObj extends configClass
             'json' => $json
         );
     }
-    function dashboardContent(){
-      $content = "
-          <div class='row'>
-            <div class='col-lg-12 grid-margin stretch-card'>
-              <div class='card'>
-                <div class='card-body'>
-                  <h4 class='card-title'>Perkembangan Omset</h4>
-                  <canvas id='barChart' style='height:230px'></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-      ";
-      return $content;
-    }
 
     function setPage_OtherScript()
     {
@@ -238,76 +221,10 @@ class dashboardObj extends configClass
 						});
 					</script>";
         return "
-        <script type='text/javascript' src='js/dashboard.js' language='JavaScript' ></script>
-        <script type='text/javascript' src='js/chart.js' language='JavaScript' ></script>
+        <script type='text/javascript' src='js/refFunnel/refFunnel.js' language='JavaScript' ></script>
 " . $scriptload;
 
     }
-    function pageShow(){
-  		global $app, $Main;
-
-  		$navatas_ = $this->setNavAtas();
-  		$navatas = $navatas_==''? // '0': '20';
-  			'':
-  			"<tr><td height='20'>".
-  					$navatas_.
-  			"</td></tr>";
-  		$form1 = $this->withform? "<form name='$this->FormName' id='$this->FormName' method='post' action=''>" : '';
-  		$form2 = $this->withform? "</form >": '';
-
-  		return
-  		//"<html xmlns='http://www.w3.org/1999/xhtml'>".
-  		"<html>".
-  		"<body class='sidebar-fixed'>".
-  		"<div class='container-scroller page-body-wrapper'>".
-  			$this->genHTMLHead().
-  		"<nav class='sidebar sidebar-offcanvas' id='sidebar'>
-  	        <ul class='nav'>
-  	            <li class='nav-item nav-profile'>
-  	                <div class='nav-link d-flex'>
-  	                    <div class='profile-image'>
-  	                        <img src='images/faces/face1.jpg' alt='image' />
-  	                        <span class='online-status online'></span>
-  	                        <!--change class online to offline or busy as needed-->
-  	                    </div>
-  	                    <div class='profile-name'>
-  	                        <p class='name'>
-  	                            Daniel Russiel
-  	                        </p>
-  	                        <p class='designation'>
-  	                            Senior Architect
-  	                        </p>
-  	                    </div>
-  	                </div>
-  	            </li>
-  	           ".$this->sideBar()."
-  	        </ul>
-  	    </nav>".
-
-  		"<div class='main-panel'>
-  		    <div class='content-wrapper' style='padding-top: 5rem;'>
-  		        <div class='row'>
-  		            <div class='col-lg-12 grid-margin'>
-  		              <div class='card'>
-  		                <div class='card-body'>
-  		                  <h4 class='card-title' style='margin-left: -14px;'>"
-  		                  	.$this->setTitle()."<hr>".
-  		                  "</h4>
-  		                  <div class='main-panel' style='width: 100%;margin: 0px;'>
-                        ".$this->dashboardContent()."
-  		                  </div>
-  		                </div>
-  		              </div>
-  		            </div>
-  		        </div>
-  		    </div>
-  		</div>".
-  		"</div>".
-  		$this->setPage_Header().
-
-  			"</body>
-  		</html>";
-  	}
 
     function Baru()
     {
@@ -664,6 +581,6 @@ class dashboardObj extends configClass
     	}
 
 }
-$dashboard = new dashboardObj();
-$dashboard->userName = $_COOKIE['coID'];;
+$refFunnel = new refFunnelObj();
+$refFunnel->userName = $_COOKIE['coID'];;
 ?>

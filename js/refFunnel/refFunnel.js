@@ -1,14 +1,14 @@
-var dashboard = new DaftarObj2({
-  prefix: "dashboard",
-  url: "pages.php?Pg=dashboard",
-  formName: "dashboardForm",
-  dashboard_form: "0", //default js dashboard
+var refFunnel = new DaftarObj2({
+  prefix: "refFunnel",
+  url: "pages.php?Pg=refFunnel",
+  formName: "refFunnelForm",
+  refFunnel_form: "0", //default js refFunnel
   loading: function() {
     //alert('loading');
-    // this.topBarRender();
-    // this.filterRender();
-    // this.daftarRender();
-    // this.sumHalRender();
+    this.topBarRender();
+    this.filterRender();
+    this.daftarRender();
+    this.sumHalRender();
   },
 
   detail: function() {
@@ -50,13 +50,7 @@ var dashboard = new DaftarObj2({
     if (err == "") {
       var cover = this.prefix + "_formcover";
       document.body.style.overflow = "hidden";
-      if (me.dashboard_form == 0) {
-        //baru dari dashboard
-        addCoverPage2(cover, 999, true, false);
-      } else {
-        //baru dari barang
-        addCoverPage2(cover, 999, true, false);
-      }
+      addCoverPage2(cover, 1030, true, false);
       $.ajax({
         type: "POST",
         data: $("#" + this.formName).serialize(),
@@ -100,7 +94,7 @@ var dashboard = new DaftarObj2({
       alert(errmsg);
     }
   },
-  Konfirmasi: function() {
+  Edit: function() {
     var me = this;
     errmsg = this.CekCheckbox();
     if (errmsg == "") {
@@ -112,7 +106,7 @@ var dashboard = new DaftarObj2({
       $.ajax({
         type: "POST",
         data: $("#" + this.formName).serialize(),
-        url: this.url + "&tipe=Konfirmasi",
+        url: this.url + "&tipe=Edit",
         success: function(data) {
           var resp = eval("(" + data + ")");
           if (resp.err == "") {
@@ -169,7 +163,7 @@ var dashboard = new DaftarObj2({
     this.OnErrorClose = false;
     document.body.style.overflow = "hidden";
     var cover = this.prefix + "_formsimpan";
-    addCoverPage2(cover, 999999, true, false);
+    addCoverPage2(cover, 1031, true, false);
     $.ajax({
       type: "POST",
       data: $("#" + this.prefix + "_form").serialize(),
@@ -191,7 +185,7 @@ var dashboard = new DaftarObj2({
     this.OnErrorClose = false;
     document.body.style.overflow = "hidden";
     var cover = this.prefix + "_formsimpan";
-    addCoverPage2(cover, 999999, true, false);
+    addCoverPage2(cover, 1031, true, false);
     $.ajax({
       type: "POST",
       data: $("#" + this.prefix + "_form").serialize()+"&idEdit="+idEdit,
