@@ -1,12 +1,12 @@
 <?php
 
-class refProdukObj extends configClass
+class refNewsObj extends configClass
 {
-    var $Prefix = 'refProduk';
+    var $Prefix = 'refNews';
     var $elCurrPage = "HalDefault";
     var $SHOW_CEK = TRUE;
-    var $TblName = 'produk'; //bonus
-    var $TblName_Hapus = 'produk';
+    var $TblName = 'news'; //bonus
+    var $TblName_Hapus = 'news';
     var $MaxFlush = 10;
     var $TblStyle = array('koptable', 'cetak', 'cetak'); //berdasar mode
     var $ColStyle = array('GarisDaftar', 'GarisCetak', 'GarisCetak');
@@ -16,24 +16,24 @@ class refProdukObj extends configClass
     var $FieldSum_Cp1 = array(14, 13, 13); //berdasar mode
     var $FieldSum_Cp2 = array(1, 1, 1);
     var $checkbox_rowspan = 2;
-    var $PageTitle = 'produk Produk';
+    var $PageTitle = 'news Produk';
     var $PageIcon = 'images/administrasi_ico.png';
     var $pagePerHal = '';
     //var $cetak_xls=TRUE ;
-    var $fileNameExcel = 'refProduk.xls';
+    var $fileNameExcel = 'refNews.xls';
     var $namaModulCetak = 'ADMINISTRASI';
-    var $Cetak_Judul = 'produk Produk';
+    var $Cetak_Judul = 'news Produk';
     var $Cetak_Mode = 2;
     var $Cetak_WIDTH = '30cm';
     var $Cetak_OtherHTMLHead;
-    var $FormName = 'refProdukForm';
+    var $FormName = 'refNewsForm';
     var $noModul = 14;
     var $TampilFilterColapse = 0; //0
     var $userName = ''; //0
 
     function setTitle()
     {
-        return 'Produk';
+        return 'news';
     }
 
     function filterSaldoMiring()
@@ -69,27 +69,27 @@ class refProdukObj extends configClass
         $content = '';
         $json    = TRUE;
 
-        if (empty($judulproduk)) {
-            $err = "Isi Judul produk ";
+        if (empty($judulNews)) {
+            $err = "Isi Judul News ";
         } elseif (empty($isiContent)) {
             $err = "Isi Content";
-        } elseif (empty($statusproduk)) {
+        } elseif (empty($statusNews)) {
             $err = "Pilih status ";
         }
 
         if ($err == '') {
 
             $dataInsert  = array(
-                'judul' => $judulproduk,
+                'judul' => $judulNews,
                 'isi_content' => base64_encode($isiContent),
                 'source_video' => $sourceVideo,
-                'kategori' => $kategoriproduk,
+                'kategori' => $kategoriNews,
                 'tanggal' => date("Y-m-d"),
                 'jam' => date("H:i:s"),
                 // 'durasi_video' => $durasiVideo,
-                'status' => $statusproduk,
+                'status' => $statusNews,
             );
-            $queryInsert = sqlInsert('produk', $dataInsert);
+            $queryInsert = sqlInsert('news', $dataInsert);
             sqlQuery($queryInsert);
 
             $cek = $queryInsert;
@@ -115,27 +115,27 @@ class refProdukObj extends configClass
 
         $fmST  = $_REQUEST[$this->Prefix . '_fmST'];
         $idplh = $_REQUEST[$this->Prefix . '_idplh'];
-        if (empty($judulproduk)) {
-            $err = "Isi Judul produk ";
+        if (empty($judulNews)) {
+            $err = "Isi Judul News ";
         } elseif (empty($isiContent)) {
             $err = "Isi Content";
-        } elseif (empty($statusproduk)) {
+        } elseif (empty($statusNews)) {
             $err = "Pilih status ";
         }
 
         if ($err == '') {
 
             $dataUpdate  = array(
-                'judul' => $judulproduk,
+                'judul' => $judulNews,
                 'isi_content' => base64_encode($isiContent),
                 'source_video' => $sourceVideo,
-                'kategori' => $kategoriproduk,
+                'kategori' => $kategoriNews,
                 'tanggal' => date("Y-m-d"),
                 'jam' => date("H:i:s"),
-                'status' => $statusproduk,
+                'status' => $statusNews,
             );
 
-          $queryUpdate = sqlUpdate('produk', $dataUpdate,"id = '$idEdit'");
+          $queryUpdate = sqlUpdate('news', $dataUpdate,"id = '$idEdit'");
           sqlQuery($queryUpdate);
           $cek = $queryUpdate;
         }
@@ -230,7 +230,7 @@ class refProdukObj extends configClass
 						});
 					</script>";
         return "
-        <script type='text/javascript' src='js/refProduk/refProduk.js' language='JavaScript' ></script>
+        <script type='text/javascript' src='js/refNews/refNews.js' language='JavaScript' ></script>
         <script type='text/javascript' src='js/quill.min.js' language='JavaScript' ></script>
         <link rel='stylesheet' href='css/quill.snow.css'>
 " . $scriptload;
@@ -244,7 +244,7 @@ class refProdukObj extends configClass
         $content            = '';
         $json               = TRUE; //$ErrMsg = 'tes';
         $form_name          = $this->Prefix . '_form';
-        $this->ukuran       = 'full'; // sm as small, md as medium, lg as large, xm as extrasmall , full as fullscreen
+        $this->ukuran       = 'lg'; // sm as small, md as medium, lg as large, xm as extrasmall , full as fullscreen
         // $this->form_width   = 600;
         // $this->form_height  = 400;
         $this->form_caption = 'Baru';
@@ -254,35 +254,36 @@ class refProdukObj extends configClass
           array("AKTIF","AKTIF"),
           array("TIDAK AKTIF","TIDAK AKTIF"),
         );
-        $comboStatus = cmbArray('statusproduk', $statusproduk, $arrayStatus, '-- STATUS --', "");
-        $comboKategori = cmbQuery("kategoriProduk",$kategoriProduk,"select id,nama_kategori from ref_kategori","class='form-control'"," -- KATEGORI --");
+        $comboStatus = cmbArray('statusNews', $statusNews, $arrayStatus, '-- STATUS --', "");
+        $arrayKategori = array(
+          array("DASHBOARD","DASHBOARD"),
+          array("FUNNEL","FUNNEL"),
+          array("COPYWRITING","COPYWRITING"),
+          array("TRAFIC / LEADS","TRAFIC / LEADS"),
+          array("BILLING","BILLING"),
+        );
+        $comboKategori = cmbArray('kategoriNews', $kategorinews, $arrayKategori, '-- KATEGORI --', "");
+        $arrayWajibTonton = array(
+          array("WAJIB","WAJIB"),
+          array("TIDAK WAJIB","TIDAK WAJIB"),
+        );
+        $comboWajibTonton = cmbArray('wajibTonton', $wajibTonton, $arrayWajibTonton, '-- WAJIB TONTON --', "");
 
+        $comboProduk = cmbQuery("idProduk",$idProduk, "select id, nama_produk from produk"," class ='form-control'"," -- PRODUK --");
         $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Nama Produk','namaProduk',$namaProduk,'12','1','11'),
-                               ));
-        $fieldInform       .=  $this->newRow(array(
-                                $this->customColumn('Kategori',$comboKategori,'12','1','11'),
+                                $this->textBoxColumn('Judul','judulNews',$judulNews,'12','1','11'),
                                ));
         $fieldInform       .=  $this->newRow(array(
                                 $this->customColumn('Deskripsi',
-                                 "<div id ='deskripsiProduk' class='quill-container' > </div>",
+                                 "<div id ='isiContent' class='quill-container' > </div>",
                                 '12','1','11'),
                                ));
         $fieldInform       .=  $this->newRow(array(
-                                $this->customColumn('Media',"<span id='tableMedia>".$this->tempTableMedia($idProduk)."</span>'",'12','1','11'),
+                               $this->textBoxColumn('Source Video','sourceVideo',$sourceVideo,'12','1','11'),
                               ));
         $fieldInform       .=  $this->newRow(array(
-                               $this->textBoxColumn('Berat','beratProduk',$beratProduk,'12','1','11'),
-                              ));
-        $fieldInform       .=  $this->newRow(array(
-                               $this->textBoxColumn('Diskon','diskonProduk',$diskonProduk,'12','1','11'),
-                              ));
-        $fieldInform       .=  $this->newRow(array(
-                               $this->textBoxColumn('Nama Diskon','namaDiskon',$namaDiskon,'12','1','11'),
-                              ));
-        $fieldInform       .=  $this->newRow(array(
-                                $this->customColumn('Cashback',"<span id='spanCashback>".$this->tempTableMedia($idProduk)."</span>'",'12','1','11'),
-                              ));
+                                $this->customColumn('Kategori',$comboKategori,'12','1','11'),
+                               ));
         $fieldInform       .=  $this->newRow(array(
                                 $this->customColumn('Status',$comboStatus,'12','1','11'),
                                ));
@@ -317,13 +318,13 @@ class refProdukObj extends configClass
         // $this->form_height  = 400;
         $this->form_caption = 'Edit';
         $idEdit             = $_REQUEST[$this->Prefix . '_cb'];
-        $getDataEdit = sqlArray(sqlQuery("select * from produk where id = '".$idEdit[0]."'"));
+        $getDataEdit = sqlArray(sqlQuery("select * from news where id = '".$idEdit[0]."'"));
 
         $arrayStatus = array(
           array("AKTIF","AKTIF"),
           array("TIDAK AKTIF","TIDAK AKTIF"),
         );
-        $comboStatus = cmbArray('statusproduk', $getDataEdit['status'], $arrayStatus, '-- STATUS --', "");
+        $comboStatus = cmbArray('statusNews', $getDataEdit['status'], $arrayStatus, '-- STATUS --', "");
         $arrayKategori = array(
           array("DASHBOARD","DASHBOARD"),
           array("FUNNEL","FUNNEL"),
@@ -331,14 +332,14 @@ class refProdukObj extends configClass
           array("TRAFIC / LEADS","TRAFIC / LEADS"),
           array("BILLING","BILLING"),
         );
-        $comboKategori = cmbArray('kategoriproduk', $getDataEdit['kategori'], $arrayKategori, '-- KATEGORI --', "");
+        $comboKategori = cmbArray('kategoriNews', $getDataEdit['kategori'], $arrayKategori, '-- KATEGORI --', "");
         $arrayWajibTonton = array(
           array("WAJIB","WAJIB"),
           array("TIDAK WAJIB","TIDAK WAJIB"),
         );
 
         $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Judul','judulproduk',$getDataEdit['judul'],'12','1','11'),
+                                $this->textBoxColumn('Judul','judulNews',$getDataEdit['judul'],'12','1','11'),
                                ));
         $fieldInform       .=  $this->newRow(array(
                                 $this->customColumn('Deskripsi',
@@ -411,24 +412,12 @@ class refProdukObj extends configClass
         $NomorColSpan = $Mode == 1 ? 2 : 1;
         $headerTable  = "<thead>
     	   <tr style='background: #1094f7;color: white;border-bottom: 2px solid #f55757;'>
-      	   <th class='th01'  width='5' colspan='1' rowspan='2'  style='text-align:center;vertical-align:middle;'>No.</th>
-      	   ".str_replace(">"," colspan='1' rowspan = '2' style='text-align:center;vertical-align:middle;'>",$Checkbox)."
-    		   <th class='th01'  width='100' colspan='1' rowspan='2'   style='text-align:center;vertical-align:middle;'>NAMA PRODUK</th>
-    		   <th class='th01'  width='100' colspan='1' rowspan='2'   style='text-align:center;vertical-align:middle;'>KATEGORI</th>
-    		   <th class='th01'  width='100' colspan='2' rowspan='1'  style='text-align:center;vertical-align:middle;border-bottom: none;'>HARGA</th>
-    		   <th class='th01'  width='100' colspan='4' rowspan='1'  style='text-align:center;vertical-align:middle;border-bottom: none;'>KOMISI</th>
-           <th class='th01'  width='100' colspan='1' rowspan='2'   style='text-align:center;vertical-align:middle;'>BERAT</th>
-           <th class='th01'  width='100' colspan='1' rowspan='2'   style='text-align:center;vertical-align:middle;'>PROMO</th>
-           <th class='th01'  width='100' colspan='1' rowspan='2'   style='text-align:center;vertical-align:middle;'>DETAIL</th>
+      	   <th class='th01'  width='5'  style='text-align:center;vertical-align:middle;'>No.</th>
+      	   $Checkbox
+    		   <th class='th01'  width='100'   style='text-align:center;vertical-align:middle;'>JUDUL</th>
+    		   <th class='th01'  width='100'   style='text-align:center;vertical-align:middle;'>SOURCE VIDEO</th>
+    		   <th class='th01'  width='100'   style='text-align:center;vertical-align:middle;'>KATEGORI</th>
     	   </tr>
-         <tr style='background: #1094f7;color: white;border-bottom: 2px solid #f55757;'>
-         <th class='th01'  width='100' colspan='1' rowspan='1'   style='text-align:center;vertical-align:middle;'>UMUM</th>
-         <th class='th01'  width='100' colspan='1' rowspan='1'   style='text-align:center;vertical-align:middle;'>MEMBER</th>
-         <th class='th01'  width='100' colspan='1' rowspan='1'   style='text-align:center;vertical-align:middle;'>LEVEL 1</th>
-         <th class='th01'  width='100' colspan='1' rowspan='1'   style='text-align:center;vertical-align:middle;'>LEVEL 2</th>
-         <th class='th01'  width='100' colspan='1' rowspan='1'   style='text-align:center;vertical-align:middle;'>LEVEL 3</th>
-         <th class='th01'  width='100' colspan='1' rowspan='1'   style='text-align:center;vertical-align:middle;'>LEVEL 4</th>
-         </tr>
 	        </thead>";
 
         return $headerTable;
@@ -453,9 +442,16 @@ class refProdukObj extends configClass
             );
         $Koloms[] = array(
             'align="left" valign="middle"',
-            $nama_produk
+            $judul
         );
-
+        $Koloms[] = array(
+            'align="left" valign="middle"',
+            $source_video
+        );
+        $Koloms[] = array(
+            'align="left" valign="middle"',
+            $kategori
+        );
 
 
 
@@ -476,7 +472,7 @@ class refProdukObj extends configClass
           $jumlahData = 50;
         }
         $arrayKategori = array(
-          array("produk","produk"),
+          array("news","news"),
           array("PRODUK","PRODUK"),
         );
         $comboKategori = cmbArray('filterKategori', $filterKategori, $arrayKategori, '-- KATEGORI --', "");
@@ -590,7 +586,7 @@ class refProdukObj extends configClass
   			  	$$key = $value;
   			 }
         // $arrayKondisi = $this->getDaftarOpsi(1);
-        // $getTotal = sqlArray(sqlQuery("select sum(total) from produk ".$arrayKondisi['Kondisi']));
+        // $getTotal = sqlArray(sqlQuery("select sum(total) from news ".$arrayKondisi['Kondisi']));
         // if($tipe == 'cetak_all'){
         //   $ContentTotalHal =
     		// 	"<tr>
@@ -620,7 +616,7 @@ class refProdukObj extends configClass
     		//$err = ''.$ids;
     		for($i = 0; $i<count($ids); $i++)	{
     			$err = $this->Hapus_Validasi($ids[$i]);
-          sqlQuery("delete from users where id_produk = '".$ids[$i]."'");
+          sqlQuery("delete from users where id_news = '".$ids[$i]."'");
     			if($err ==''){
     				$get = $this->Hapus_Data($ids[$i]);
     				$err = $get['err'];
@@ -639,11 +635,7 @@ class refProdukObj extends configClass
     		return array('err'=>$err,'cek'=>$cek);
     	}
 
-      function tempTableMedia($idProduk){
-        return "";
-      }
-
 }
-$refProduk = new refProdukObj();
-$refProduk->userName = $_COOKIE['coID'];;
+$refNews = new refNewsObj();
+$refNews->userName = $_COOKIE['coID'];;
 ?>

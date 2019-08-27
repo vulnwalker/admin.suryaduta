@@ -31,6 +31,39 @@ if (CekLogin () == false){
 				}
 				break;
 			}
+			case 'refProduk':{
+				if (CekLogin()) {  setLastAktif();
+					include('common/daftarobj.php');
+					include('common/configClass.php');
+					include("pages/refProduk/refProduk.php");
+					$refProduk->selector();
+				}else{
+					header("Location:index.php?");
+				}
+				break;
+			}
+			case 'refNews':{
+				if (CekLogin()) {  setLastAktif();
+					include('common/daftarobj.php');
+					include('common/configClass.php');
+					include("pages/refNews/refNews.php");
+					$refNews->selector();
+				}else{
+					header("Location:index.php?");
+				}
+				break;
+			}
+			case 'refTraining':{
+				if (CekLogin()) {  setLastAktif();
+					include('common/daftarobj.php');
+					include('common/configClass.php');
+					include("pages/refTraining/refTraining.php");
+					$refTraining->selector();
+				}else{
+					header("Location:index.php?");
+				}
+				break;
+			}
 			case 'refMember':{
 				if (CekLogin()) {  setLastAktif();
 					include('common/daftarobj.php');

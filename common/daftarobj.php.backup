@@ -3218,7 +3218,7 @@ function createHeaderPage($headerIco, $headerTitle,  $otherMenu='', $headerFixed
 	                    </div>
 	                </div>
 	            </li>
-	           ".$this->sideBar()."
+	            ".$this-sideBar()."
 	        </ul>
 	    </nav>".
 
@@ -3265,7 +3265,6 @@ function createHeaderPage($headerIco, $headerTitle,  $otherMenu='', $headerFixed
 			"</body>
 		</html>";
 	}
-
   function sideBar(){
     return "
     <li class='nav-item nav-category'>

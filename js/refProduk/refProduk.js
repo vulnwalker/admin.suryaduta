@@ -39,32 +39,9 @@ var refProduk = new DaftarObj2({
           resp.content;
         $("#collapseOne").attr("class", "collapse");
         me.sumHalRender();
-        me.setTableHeader();
+        TableResponsive();
       }
     });
-  },
-  showDetail: function(idProduk) {
-    var me = this;
-    var err = "";
-
-    if (err == "") {
-      var cover = this.prefix + "_formcover";
-      document.body.style.overflow = "hidden";
-      addCoverPage2(cover, 999, true, false);
-      $.ajax({
-        type: "POST",
-        data: {
-          idProduk : idProduk
-        },
-        url: this.url + "&tipe=showDetail",
-        success: function(data) {
-          var resp = eval("(" + data + ")");
-          document.getElementById(cover).innerHTML = resp.content;
-        }
-      });
-    } else {
-      alert(err);
-    }
   },
   Baru: function() {
     var me = this;
@@ -73,13 +50,7 @@ var refProduk = new DaftarObj2({
     if (err == "") {
       var cover = this.prefix + "_formcover";
       document.body.style.overflow = "hidden";
-      if (me.refProduk_form == 0) {
-        //baru dari refProduk
-        addCoverPage2(cover, 999, true, false);
-      } else {
-        //baru dari barang
-        addCoverPage2(cover, 999, true, false);
-      }
+      addCoverPage2(cover, 1030, true, false);
       $.ajax({
         type: "POST",
         data: $("#" + this.formName).serialize(),
@@ -87,6 +58,21 @@ var refProduk = new DaftarObj2({
         success: function(data) {
           var resp = eval("(" + data + ")");
           document.getElementById(cover).innerHTML = resp.content;
+          if ($("#deskripsiProduk").length) {
+            var quill = new Quill('#deskripsiProduk', {
+              modules: {
+                toolbar: [
+                  [{
+                    header: [1, 2, false]
+                  }],
+                  ['bold', 'italic', 'underline'],
+                  ['image', 'code-block']
+                ]
+              },
+              placeholder: 'Compose an epic...',
+              theme: 'snow' // or 'bubble'
+            });
+          }
           me.AfterFormBaru();
         }
       });
@@ -94,7 +80,7 @@ var refProduk = new DaftarObj2({
       alert(err);
     }
   },
-  Edit: function() {
+  Detail: function() {
     var me = this;
     errmsg = this.CekCheckbox();
     if (errmsg == "") {
@@ -106,7 +92,7 @@ var refProduk = new DaftarObj2({
       $.ajax({
         type: "POST",
         data: $("#" + this.formName).serialize(),
-        url: this.url + "&tipe=Edit",
+        url: this.url + "&tipe=Detail",
         success: function(data) {
           var resp = eval("(" + data + ")");
           if (resp.err == "") {
@@ -123,7 +109,64 @@ var refProduk = new DaftarObj2({
       alert(errmsg);
     }
   },
-  saveNew: function() {
+  Edit: function() {
+    var me = this;
+    errmsg = this.CekCheckbox();
+    if (errmsg == "") {
+      var box = this.GetCbxChecked();
+       //1030 >
+      var cover = this.prefix + "_formcover";
+      addCoverPage2(cover, 1030, true, false);
+      document.body.style.overflow = "hidden";
+      $.ajax({
+        type: "POST",
+        data: $("#" + this.formName).serialize(),
+        url: this.url + "&tipe=Edit",
+        success: function(data) {
+          var resp = eval("(" + data + ")");
+          if (resp.err == "") {
+            document.getElementById(cover).innerHTML = resp.content;
+            if ($("#deskripsiProduk").length) {
+              var quill = new Quill('#deskripsiProduk', {
+                modules: {
+                  toolbar: [
+                    [{
+                      header: [1, 2, false]
+                    }],
+                    ['bold', 'italic', 'underline'],
+                    ['image', 'code-block']
+                  ]
+                },
+                placeholder: 'Compose an epic...',
+                theme: 'snow' // or 'bubble'
+              });
+            }
+            me.AfterFormEdit(resp);
+          } else {
+            alert(resp.err);
+            delElem(cover);
+            document.body.style.overflow = "auto";
+          }
+        }
+      });
+    } else {
+      alert(errmsg);
+    }
+  },
+  Invoice: function() {
+    var me = this;
+    errmsg = this.CekCheckbox();
+    if (errmsg == "") {
+      var aForm = document.getElementById(this.prefix+"Form");
+      aForm.action = "pages.php?Pg="+this.prefix+"&tipe=Invoice";
+      aForm.target = "_blank";
+      aForm.submit();
+      aForm.target = "";
+    } else {
+      alert(errmsg);
+    }
+  },
+  saveKonfirmasi: function(idPenjualan) {
     var me = this;
     this.OnErrorClose = false;
     document.body.style.overflow = "hidden";
@@ -131,7 +174,29 @@ var refProduk = new DaftarObj2({
     addCoverPage2(cover, 999999, true, false);
     $.ajax({
       type: "POST",
-      data: $("#" + this.prefix + "_form").serialize(),
+      data: $("#" + this.prefix + "_form").serialize()+"&idPenjualan="+idPenjualan,
+      url: this.url + "&tipe=saveKonfirmasi",
+      success: function(data) {
+        var resp = eval("(" + data + ")");
+        delElem(cover);
+        if (resp.err == "") {
+          me.Close();
+          me.refreshList();
+        } else {
+          alert(resp.err);
+        }
+      }
+    });
+  },
+  saveNew: function() {
+    var me = this;
+    this.OnErrorClose = false;
+    document.body.style.overflow = "hidden";
+    var cover = this.prefix + "_formsimpan";
+    addCoverPage2(cover, 1031, true, false);
+    $.ajax({
+      type: "POST",
+      data: $("#" + this.prefix + "_form").serialize()+"&isiContent="+$("#isiContent").html(),
       url: this.url + "&tipe=saveNew",
       success: function(data) {
         var resp = eval("(" + data + ")");
@@ -150,10 +215,10 @@ var refProduk = new DaftarObj2({
     this.OnErrorClose = false;
     document.body.style.overflow = "hidden";
     var cover = this.prefix + "_formsimpan";
-    addCoverPage2(cover, 999999, true, false);
+    addCoverPage2(cover, 1031, true, false);
     $.ajax({
       type: "POST",
-      data: $("#" + this.prefix + "_form").serialize()+"&idEdit="+idEdit,
+      data: $("#" + this.prefix + "_form").serialize()+"&idEdit="+idEdit+"&isiContent="+$("#isiContent").html(),
       url: this.url + "&tipe=saveEdit",
       success: function(data) {
         var resp = eval("(" + data + ")");
