@@ -1,8 +1,8 @@
-var refProduk = new DaftarObj2({
-  prefix: "refProduk",
-  url: "pages.php?Pg=refProduk",
-  formName: "refProdukForm",
-  refProduk_form: "0", //default js refProduk
+var modulOmset = new DaftarObj2({
+  prefix: "modulOmset",
+  url: "pages.php?Pg=modulOmset",
+  formName: "modulOmsetForm",
+  modulOmset_form: "0", //default js modulOmset
   loading: function() {
     //alert('loading');
     this.topBarRender();
@@ -109,7 +109,7 @@ var refProduk = new DaftarObj2({
       alert(errmsg);
     }
   },
-  Edit: function() {
+  detailKomisi: function() {
     var me = this;
     errmsg = this.CekCheckbox();
     if (errmsg == "") {
@@ -121,26 +121,26 @@ var refProduk = new DaftarObj2({
       $.ajax({
         type: "POST",
         data: $("#" + this.formName).serialize(),
-        url: this.url + "&tipe=Edit",
+        url: this.url + "&tipe=detailKomisi",
         success: function(data) {
           var resp = eval("(" + data + ")");
           if (resp.err == "") {
             document.getElementById(cover).innerHTML = resp.content;
-            if ($("#deskripsiProduk").length) {
-              var quill = new Quill('#deskripsiProduk', {
-                modules: {
-                  toolbar: [
-                    [{
-                      header: [1, 2, false]
-                    }],
-                    ['bold', 'italic', 'underline'],
-                    ['image', 'code-block']
-                  ]
-                },
-                placeholder: 'Compose an epic...',
-                theme: 'snow' // or 'bubble'
-              });
-            }
+            // if ($("#deskripsiProduk").length) {
+            //   var quill = new Quill('#deskripsiProduk', {
+            //     modules: {
+            //       toolbar: [
+            //         [{
+            //           header: [1, 2, false]
+            //         }],
+            //         ['bold', 'italic', 'underline'],
+            //         ['image', 'code-block']
+            //       ]
+            //     },
+            //     placeholder: 'Compose an epic...',
+            //     theme: 'snow' // or 'bubble'
+            //   });
+            // }
             me.AfterFormEdit(resp);
           } else {
             alert(resp.err);
@@ -211,28 +211,7 @@ var refProduk = new DaftarObj2({
       alert(errmsg);
     }
   },
-  saveKonfirmasi: function(idPenjualan) {
-    var me = this;
-    this.OnErrorClose = false;
-    document.body.style.overflow = "hidden";
-    var cover = this.prefix + "_formsimpan";
-    addCoverPage2(cover, 999999, true, false);
-    $.ajax({
-      type: "POST",
-      data: $("#" + this.prefix + "_form").serialize()+"&idPenjualan="+idPenjualan,
-      url: this.url + "&tipe=saveKonfirmasi",
-      success: function(data) {
-        var resp = eval("(" + data + ")");
-        delElem(cover);
-        if (resp.err == "") {
-          me.Close();
-          me.refreshList();
-        } else {
-          alert(resp.err);
-        }
-      }
-    });
-  },
+
   saveNew: function() {
     var me = this;
     this.OnErrorClose = false;
@@ -255,7 +234,7 @@ var refProduk = new DaftarObj2({
       }
     });
   },
-  saveEdit: function(idEdit) {
+  saveKonfirmasi: function(idEdit) {
     var me = this;
     this.OnErrorClose = false;
     document.body.style.overflow = "hidden";
@@ -263,8 +242,8 @@ var refProduk = new DaftarObj2({
     addCoverPage2(cover, 9999, true, false);
     $.ajax({
       type: "POST",
-      data: $("#" + this.prefix + "_form").serialize()+"&idEdit="+idEdit+"&deskripsiProduk="+$("#deskripsiProduk").html(),
-      url: this.url + "&tipe=saveEdit",
+      data: $("#" + this.prefix + "_form").serialize()+"&idEdit="+idEdit,
+      url: this.url + "&tipe=saveKonfirmasi",
       success: function(data) {
         var resp = eval("(" + data + ")");
         delElem(cover);

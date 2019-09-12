@@ -47,8 +47,8 @@ class refMemberObj extends configClass
        $fabMenu .= fujinFabMenu('','Baru()','Baru','sections.png','',$this->Prefix);
        $fabMenu .= fujinFabMenu('','Edit()','Edit','edit_f2.png','',$this->Prefix);
        $fabMenu .= fujinFabMenu('','Hapus()','Hapus','delete_f2.png','',$this->Prefix);
+       $fabMenu .= fujinFabMenu('','Downline()','Downline','print.png','',$this->Prefix);
        // $fabMenu .= fujinFabMenu('','cetakAll()','Cetak','print.png','',$this->Prefix);
-       // $fabMenu .= fujinFabMenu('','Invoice()','Invoice','print.png','',$this->Prefix);
 
        return $fabMenu;
     }
@@ -142,6 +142,7 @@ class refMemberObj extends configClass
         } elseif (empty($teleponMember)) {
             $err = "Isi Telepon";
         }
+        $getDataBefore = sqlArray(sqlQuery("select * from member where id = '$idEdit'"));
 
         if ($err == '') {
           $dataUpdate  = array(
@@ -151,12 +152,32 @@ class refMemberObj extends configClass
               'nama_bank' => $namaBank,
               'nomor_rekening' => $nomorRekening,
               'nama_rekening' => $namaRekening,
-              'lisensi' => $lisensiMember,
+              // 'lisensi' => $lisensiMember,
           );
-
+          if($getDataBefore['lisensi'] != $lisensiMember ){
+            if($lisensiMember == 'AGEN'){
+              $getSettingPrice = sqlArray(sqlQuery("select * from setting where nama = 'LISENSI AGEN'"));
+            }elseif($lisensiMember == 'STOKIS'){
+              $getSettingPrice = sqlArray(sqlQuery("select * from setting where nama = 'LISENSI STOKIS'"));
+            }
+            $generateKodeUnik = sqlArray(sqlQuery("select max(id) from transaksi"));
+            $kodeUnik = genNumber(substr($generateKodeUnik['max(id)'], -3),3);
+            $dataTransaksi = array(
+              'id_member' => $idEdit,
+              'nama_pembeli' => $getDataBefore['nama'],
+              'email_pembeli' => $getDataBefore['email'],
+              'tanggal' => date("Y-m-d"),
+              'total' => $getSettingPrice['isi'] + $kodeUnik,
+              'kode_unik' => $kodeUnik,
+              'status' => "BELUM BAYAR",
+              'jenis_transaksi' => "UPGRADE LISENSI $lisensiMember",
+            );
+            $queryInsertTransaksi = sqlInsert("transaksi",$dataTransaksi);
+            sqlQuery($queryInsertTransaksi);
+          }
           $queryUpdate = sqlUpdate('member', $dataUpdate,"id = '$idEdit'");
           sqlQuery($queryUpdate);
-          $cek = $queryUpdate;
+          $cek = $queryInsertTransaksi;
         }
 
         return array(
@@ -468,7 +489,7 @@ class refMemberObj extends configClass
         $getNamaUplineLevel1 = sqlArray(sqlQuery("select * from member where id = '$upline_level_1'"));
         $getNamaUplineLevel2 = sqlArray(sqlQuery("select * from member where id = '$upline_level_2'"));
         $getNamaUplineLevel3 = sqlArray(sqlQuery("select * from member where id = '$upline_level_3'"));
-        $getNamaUplineLevel4 = sqlArray(sqlQuery("select * from member where id = '$upline_level_4'"));
+        // $getNamaUplineLevel4 = sqlArray(sqlQuery("select * from member where id = '$upline_level_4'"));
 
         $arrayPiramid = array();
         if(!empty($getNamaUplineLevel4['nama']))$arrayPiramid[]=$getNamaUplineLevel4['nama'];
@@ -478,7 +499,7 @@ class refMemberObj extends configClass
 
         $Koloms[] = array(
             'align="center" valign="middle"',
-            implode("<br> V <br> V <br>",$arrayPiramid)
+            implode("<br> <i class='fa fa-chevron-down'></i> <br>",$arrayPiramid)
         );
         $Koloms[] = array(
             'align="left" valign="middle"',
@@ -607,7 +628,7 @@ class refMemberObj extends configClass
         $fmDESC1   = cekPOST('fmDESC1');
         $Asc1      = $fmDESC1 == '' ? '' : 'desc';
         $arrOrders = array();
-        $arrOrders[] = " id desc ";
+        $arrOrders[] = " id asc ";
         $Order        = join(',', $arrOrders);
         $OrderDefault = '';
         $Order        = $Order == '' ? $OrderDefault : ' Order By ' . $Order;

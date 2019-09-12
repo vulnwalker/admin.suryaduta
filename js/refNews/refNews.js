@@ -126,8 +126,8 @@ var refNews = new DaftarObj2({
           var resp = eval("(" + data + ")");
           if (resp.err == "") {
             document.getElementById(cover).innerHTML = resp.content;
-            if ($("#deskripsiTraining").length) {
-              var quill = new Quill('#deskripsiTraining', {
+            if ($("#isiContent").length) {
+              var quill = new Quill('#isiContent', {
                 modules: {
                   toolbar: [
                     [{

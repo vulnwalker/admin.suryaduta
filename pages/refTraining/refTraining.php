@@ -88,6 +88,7 @@ class refTrainingObj extends configClass
                 'wajib_tonton' => $wajibTonton,
                 'tanggal_update' => date("Y-m-d"),
                 'jam_update' => date("H:i:s"),
+                'urutan' => $urutanTraining,
                 'durasi_video' => $durasiVideo,
                 'status' => $statusTraining,
             );
@@ -133,6 +134,7 @@ class refTrainingObj extends configClass
                 'video_souce' => $sourceVideo,
                 'thumbnail' => $thumbnailVideo,
                 'kategori' => $kategoriTraining,
+                'urutan' => $urutanTraining,
                 'wajib_tonton' => $wajibTonton,
                 'tanggal_update' => date("Y-m-d"),
                 'jam_update' => date("H:i:s"),
@@ -187,6 +189,13 @@ class refTrainingObj extends configClass
             }
             case 'Edit': {
                 $fm      = $this->Edit();
+                $cek     = $fm['cek'];
+                $err     = $fm['err'];
+                $content = $fm['content'];
+                break;
+            }
+            case 'showDetail': {
+                $fm      = $this->showDetail($_REQUEST['idEdit']);
                 $cek     = $fm['cek'];
                 $err     = $fm['err'];
                 $content = $fm['content'];
@@ -293,6 +302,9 @@ class refTrainingObj extends configClass
                                 $this->customColumn('Kategori',$comboKategori,'12','1','11'),
                                ));
         $fieldInform       .=  $this->newRow(array(
+                               $this->textBoxColumn('Urutan','urutanTraining',$urutanTraining,'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
                                 $this->customColumn('Wajib Tonton',$comboWajibTonton,'12','1','11'),
                                ));
         $fieldInform       .=  $this->newRow(array(
@@ -368,6 +380,9 @@ class refTrainingObj extends configClass
         $fieldInform       .=  $this->newRow(array(
                                 $this->customColumn('Kategori',$comboKategori,'12','1','11'),
                                ));
+         $fieldInform       .=  $this->newRow(array(
+                                $this->textBoxColumn('Urutan','urutanTraining',$getDataEdit['urutan'],'12','1','11'),
+                               ));
         $fieldInform       .=  $this->newRow(array(
                                 $this->customColumn('Wajib Tonton',$comboWajibTonton,'12','1','11'),
                                ));
@@ -380,6 +395,84 @@ class refTrainingObj extends configClass
         $this->form_menubawah =
 
         "<input type='button' class='btn btn-success btn-sm' value='Simpan' onclick ='" . $this->Prefix .".saveEdit(".$idEdit[0].")' > ".
+        "<input type='button' class='btn btn-success btn-sm' value='Tutup' onclick ='" . $this->Prefix .".Close()' >"
+
+        ;
+
+        $form    = $this->genForm();
+        $content = $form; //$content = 'content';
+        return array(
+            'cek' => $cek,
+            'err' => $err,
+            'content' => $content
+        );
+    }
+    function showDetail($idEdit)
+    {
+        $cek                = '';
+        $err                = '';
+        $content            = '';
+        $json               = TRUE; //$ErrMsg = 'tes';
+        $form_name          = $this->Prefix . '_form';
+        $this->ukuran       = 'lg'; // sm as small, md as medium, lg as large, xm as extrasmall , full as fullscreen
+        // $this->form_width   = 600;
+        // $this->form_height  = 400;
+        $this->form_caption = 'Edit';
+        // $idEdit             = $_REQUEST[$this->Prefix . '_cb'];
+        $getDataEdit = sqlArray(sqlQuery("select * from training where id = '".$idEdit."'"));
+
+        $arrayStatus = array(
+          array("AKTIF","AKTIF"),
+          array("TIDAK AKTIF","TIDAK AKTIF"),
+        );
+        $comboStatus = cmbArray('statusTraining', $getDataEdit['status'], $arrayStatus, '-- STATUS --', "");
+        $arrayKategori = array(
+          array("TRAINING","TRAINING"),
+          array("PRODUK","PRODUK"),
+        );
+        $comboKategori = cmbArray('kategoriTraining', $getDataEdit['kategori'], $arrayKategori, '-- KATEGORI --', "");
+        $arrayWajibTonton = array(
+          array("WAJIB","WAJIB"),
+          array("TIDAK WAJIB","TIDAK WAJIB"),
+        );
+        $comboWajibTonton = cmbArray('wajibTonton', $getDataEdit['wajib_tonton'], $arrayWajibTonton, '-- WAJIB TONTON --', "");
+
+        $comboProduk = cmbQuery("idProduk",$idProduk, "select id, nama_produk from produk"," class ='form-control'"," -- PRODUK --");
+        $fieldInform       .=  $this->newRow(array(
+                                $this->textBoxColumn('Judul','judulTraining',$getDataEdit['judul_materi'],'12','1','11'),
+                               ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Deskripsi',
+                                 "<div id ='deskripsiTraining' class='quill-container' >".base64_decode($getDataEdit['deskripsi_materi'])."</div>",
+                                '12','1','11'),
+                               ));
+        $fieldInform       .=  $this->newRow(array(
+                               $this->textBoxColumn('Source Video','sourceVideo',$getDataEdit['video_souce'],'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                               $this->textBoxColumn('Durasi Video','durasiVideo',$getDataEdit['durasi_video'],'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                               $this->textBoxColumn('Thumbnail','thumbnailVideo',$getDataEdit['thumbnail'],'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Kategori',$comboKategori,'12','1','11'),
+                               ));
+         $fieldInform       .=  $this->newRow(array(
+                                $this->textBoxColumn('Urutan','urutanTraining',$getDataEdit['urutan'],'12','1','11'),
+                               ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Wajib Tonton',$comboWajibTonton,'12','1','11'),
+                               ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Status',$comboStatus,'12','1','11'),
+                               ));
+
+        $this->form_fields =  "<div class='FilterBar row' style='padding: 1%;margin-top:5px;'>".$fieldInform."</div>";
+
+        $this->form_menubawah =
+
+        // "<input type='button' class='btn btn-success btn-sm' value='Simpan' onclick ='" . $this->Prefix .".saveEdit(".$idEdit[0].")' > ".
         "<input type='button' class='btn btn-success btn-sm' value='Tutup' onclick ='" . $this->Prefix .".Close()' >"
 
         ;
@@ -489,7 +582,7 @@ class refTrainingObj extends configClass
         );
         $Koloms[] = array(
             'align="center" valign="middle"',
-            "DETAIL"
+            "<input type='button' class='btn btn-success' value='DETAIL' onclick=$this->Prefix.showDetail($id)> "
         );
 
 

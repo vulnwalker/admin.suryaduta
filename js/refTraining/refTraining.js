@@ -260,6 +260,51 @@ var refTraining = new DaftarObj2({
      fileReader.readAsDataURL(fileToLoad);
    }
  },
+ showDetail: function(idEdit) {
+   var me = this;
+   // errmsg = this.CekCheckbox();
+   errmsg = "";
+   if (errmsg == "") {
+     var box = this.GetCbxChecked();
+      //1030 >
+     var cover = this.prefix + "_formcover";
+     addCoverPage2(cover, 1030, true, false);
+     document.body.style.overflow = "hidden";
+     $.ajax({
+       type: "POST",
+       data: $("#" + this.formName).serialize()+"&idEdit="+idEdit,
+       url: this.url + "&tipe=showDetail",
+       success: function(data) {
+         var resp = eval("(" + data + ")");
+         if (resp.err == "") {
+           document.getElementById(cover).innerHTML = resp.content;
+           if ($("#deskripsiTraining").length) {
+             var quill = new Quill('#deskripsiTraining', {
+               modules: {
+                 toolbar: [
+                   [{
+                     header: [1, 2, false]
+                   }],
+                   ['bold', 'italic', 'underline'],
+                   ['image', 'code-block']
+                 ]
+               },
+               placeholder: 'Compose an epic...',
+               theme: 'snow' // or 'bubble'
+             });
+           }
+           me.AfterFormEdit(resp);
+         } else {
+           alert(resp.err);
+           delElem(cover);
+           document.body.style.overflow = "auto";
+         }
+       }
+     });
+   } else {
+     alert(errmsg);
+   }
+ },
 
 
 });

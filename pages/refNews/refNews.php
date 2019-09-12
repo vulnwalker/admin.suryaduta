@@ -261,6 +261,7 @@ class refNewsObj extends configClass
           array("COPYWRITING","COPYWRITING"),
           array("TRAFIC / LEADS","TRAFIC / LEADS"),
           array("BILLING","BILLING"),
+          array("NEWS","NEWS"),
         );
         $comboKategori = cmbArray('kategoriNews', $kategorinews, $arrayKategori, '-- KATEGORI --', "");
         $arrayWajibTonton = array(
@@ -331,6 +332,7 @@ class refNewsObj extends configClass
           array("COPYWRITING","COPYWRITING"),
           array("TRAFIC / LEADS","TRAFIC / LEADS"),
           array("BILLING","BILLING"),
+          array("NEWS","NEWS"),
         );
         $comboKategori = cmbArray('kategoriNews', $getDataEdit['kategori'], $arrayKategori, '-- KATEGORI --', "");
         $arrayWajibTonton = array(
@@ -417,6 +419,7 @@ class refNewsObj extends configClass
     		   <th class='th01'  width='100'   style='text-align:center;vertical-align:middle;'>JUDUL</th>
     		   <th class='th01'  width='100'   style='text-align:center;vertical-align:middle;'>SOURCE VIDEO</th>
     		   <th class='th01'  width='100'   style='text-align:center;vertical-align:middle;'>KATEGORI</th>
+    		   <th class='th01'  width='100'   style='text-align:center;vertical-align:middle;'>STATUS</th>
     	   </tr>
 	        </thead>";
 
@@ -452,6 +455,10 @@ class refNewsObj extends configClass
             'align="left" valign="middle"',
             $kategori
         );
+        $Koloms[] = array(
+            'align="center" valign="middle"',
+            $status
+        );
 
 
 
@@ -472,8 +479,12 @@ class refNewsObj extends configClass
           $jumlahData = 50;
         }
         $arrayKategori = array(
-          array("news","news"),
-          array("PRODUK","PRODUK"),
+          array("DASHBOARD","DASHBOARD"),
+          array("FUNNEL","FUNNEL"),
+          array("COPYWRITING","COPYWRITING"),
+          array("TRAFIC / LEADS","TRAFIC / LEADS"),
+          array("BILLING","BILLING"),
+          array("NEWS","NEWS"),
         );
         $comboKategori = cmbArray('filterKategori', $filterKategori, $arrayKategori, '-- KATEGORI --', "");
         // $this->textBoxColumn('title','id','value','col_field','col_label','col_input');
@@ -538,7 +549,7 @@ class refNewsObj extends configClass
         }
         $arrKondisi = array();
         if (!empty($filterJudul)) {
-            $arrKondisi[] = "judul_materi like '%$filterJudul%'";
+            $arrKondisi[] = "judul like '%$filterJudul%'";
         }
         if (!empty($filterStatus)) {
             $arrKondisi[] = "status ='$filterStatus'";

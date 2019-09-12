@@ -540,7 +540,7 @@ class configClass extends DaftarObj2 {
           </div>
         </div>";
     }
-    function textAreaBoxColumn($title='',$id='',$value='',$col_field='12',$col_label='6',$col_input='6',$params)
+    function textAreaBoxColumn($title='',$id='',$value='',$col_field='12',$col_label='6',$col_input='6',$params = "")
     {
         return "
         <div class='col-md-".$col_field."'>

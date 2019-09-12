@@ -69,25 +69,40 @@ class refProdukObj extends configClass
         $content = '';
         $json    = TRUE;
 
-        if (empty($judulproduk)) {
-            $err = "Isi Judul produk ";
-        } elseif (empty($isiContent)) {
-            $err = "Isi Content";
-        } elseif (empty($statusproduk)) {
-            $err = "Pilih status ";
+        if (empty($namaProduk)) {
+            $err = "Isi Nama produk ";
+        } elseif (empty($deskripsiProduk)) {
+            // $err = "Isi Deskripsi";
+        } elseif (empty($hargaUmum)) {
+            $err = "Isi Harga ";
         }
 
         if ($err == '') {
-
+            $getDataMedia = sqlQuery("select * from temp_media_produk where username = '".$this->userName."'");
+            $arrayMedia = array();
+            while ($dataMedia = sqlArray($getDataMedia)) {
+              $arrayMedia[] = array(
+                'sourceMedia' => $dataMedia['media'],
+                'type' => $dataMedia['type'],
+              );
+            }
+            $arrayKomisi = array();
+            $arrayKomisi[] = $jumlahKomisiLevel1;
+            $arrayKomisi[] = $jumlahKomisiLevel2;
+            $arrayKomisi[] = $jumlahKomisiLevel3;
+            $arrayKomisi[] = $jumlahKomisiLevel4;
             $dataInsert  = array(
-                'judul' => $judulproduk,
-                'isi_content' => base64_encode($isiContent),
-                'source_video' => $sourceVideo,
-                'kategori' => $kategoriproduk,
-                'tanggal' => date("Y-m-d"),
-                'jam' => date("H:i:s"),
-                // 'durasi_video' => $durasiVideo,
-                'status' => $statusproduk,
+                'nama_produk' => $namaProduk,
+                'kategori' => $kategoriProduk,
+                'deskripsi' => base64_encode($deskripsiProduk),
+                'harga' => $hargaUmum,
+                'harga_member' => $hargaMember,
+                'media' => json_encode($arrayMedia),
+                'berat' => $beratProduk,
+                'komisi' => json_encode($arrayKomisi),
+                'diskon' => $diskonProduk,
+                'nama_diskon' => $namaDiskon,
+                'status' => $statusProduk,
             );
             $queryInsert = sqlInsert('produk', $dataInsert);
             sqlQuery($queryInsert);
@@ -115,24 +130,40 @@ class refProdukObj extends configClass
 
         $fmST  = $_REQUEST[$this->Prefix . '_fmST'];
         $idplh = $_REQUEST[$this->Prefix . '_idplh'];
-        if (empty($judulproduk)) {
-            $err = "Isi Judul produk ";
-        } elseif (empty($isiContent)) {
-            $err = "Isi Content";
-        } elseif (empty($statusproduk)) {
-            $err = "Pilih status ";
+        if (empty($namaProduk)) {
+            $err = "Isi Nama produk ";
+        } elseif (empty($deskripsiProduk)) {
+            // $err = "Isi Deskripsi";
+        } elseif (empty($hargaUmum)) {
+            $err = "Isi Harga ";
         }
 
         if ($err == '') {
-
+            $getDataMedia = sqlQuery("select * from temp_media_produk where username = '".$this->userName."'");
+            $arrayMedia = array();
+            while ($dataMedia = sqlArray($getDataMedia)) {
+              $arrayMedia[] = array(
+                'sourceMedia' => $dataMedia['media'],
+                'type' => $dataMedia['type'],
+              );
+            }
+            $arrayKomisi = array();
+            $arrayKomisi[] = $jumlahKomisiLevel1;
+            $arrayKomisi[] = $jumlahKomisiLevel2;
+            $arrayKomisi[] = $jumlahKomisiLevel3;
+            $arrayKomisi[] = $jumlahKomisiLevel4;
             $dataUpdate  = array(
-                'judul' => $judulproduk,
-                'isi_content' => base64_encode($isiContent),
-                'source_video' => $sourceVideo,
-                'kategori' => $kategoriproduk,
-                'tanggal' => date("Y-m-d"),
-                'jam' => date("H:i:s"),
-                'status' => $statusproduk,
+                'nama_produk' => $namaProduk,
+                'kategori' => $kategoriProduk,
+                'deskripsi' => base64_encode($deskripsiProduk),
+                'harga' => $hargaUmum,
+                'harga_member' => $hargaMember,
+                'media' => json_encode($arrayMedia),
+                'berat' => $beratProduk,
+                'komisi' => json_encode($arrayKomisi),
+                'diskon' => $diskonProduk,
+                'nama_diskon' => $namaDiskon,
+                'status' => $statusProduk,
             );
 
           $queryUpdate = sqlUpdate('produk', $dataUpdate,"id = '$idEdit'");
@@ -170,9 +201,80 @@ class refProdukObj extends configClass
         $err     = '';
         $content = '';
         $json    = TRUE;
-
+        foreach ($_REQUEST as $key => $value) {
+            $$key = $value;
+        }
         switch ($tipe) {
 
+            case 'saveNewMedia': {
+                if(empty($sourceMedia)){
+                  $err = "Isi source media ";
+                }elseif(empty($typeMedia)){
+                  $err = "Pilih type media";
+                }else{
+                  $dataMedia = array(
+                    'media' => $sourceMedia,
+                    'type' => $typeMedia,
+                    'username' => $this->userName,
+                  );
+                  $queryInsert = sqlInsert("temp_media_produk",$dataMedia);
+                  sqlQuery($queryInsert);
+                  $cek = $queryInsert;
+                }
+                $content = array(
+                  'tableMedia' => $this->addMedia()
+                );
+                break;
+            }
+            case 'saveEditMedia': {
+                if(empty($sourceMedia)){
+                  $err = "Isi source media ";
+                }elseif(empty($typeMedia)){
+                  $err = "Pilih type media";
+                }else{
+                  $dataUpdate = array(
+                    'media' => $sourceMedia,
+                    'type' => $typeMedia,
+                    'username' => $this->userName,
+                  );
+                  $queryUpdate = sqlUpdate("temp_media_produk",$dataUpdate,"id = '$idEdit'");
+                  sqlQuery($queryUpdate);
+                  $cek = $queryUpdate;
+                }
+                $content = array(
+                  'tableMedia' => $this->addMedia()
+                );
+                break;
+            }
+            case 'hapusMedia': {
+                sqlQuery("delete from temp_media_produk where id = '$idEdit'");
+                $cek = "delete from temp_media_produk where id = '$idEdit'";
+                $content = array(
+                  'tableMedia' => $this->tempTableMedia()
+                );
+                break;
+            }
+            case 'batalMedia': {
+
+                $content = array(
+                  'tableMedia' => $this->tempTableMedia()
+                );
+                break;
+            }
+            case 'addMedia': {
+
+                $content = array(
+                  'tableMedia' => $this->addMedia()
+                );
+                break;
+            }
+            case 'editMedia': {
+
+                $content = array(
+                  'tableMedia' => $this->editMedia($idEdit)
+                );
+                break;
+            }
             case 'Baru': {
                 $fm      = $this->Baru();
                 $cek     = $fm['cek'];
@@ -182,6 +284,13 @@ class refProdukObj extends configClass
             }
             case 'Edit': {
                 $fm      = $this->Edit();
+                $cek     = $fm['cek'];
+                $err     = $fm['err'];
+                $content = $fm['content'];
+                break;
+            }
+            case 'showDetail': {
+                $fm      = $this->showDetail($idEdit);
                 $cek     = $fm['cek'];
                 $err     = $fm['err'];
                 $content = $fm['content'];
@@ -254,8 +363,9 @@ class refProdukObj extends configClass
           array("AKTIF","AKTIF"),
           array("TIDAK AKTIF","TIDAK AKTIF"),
         );
-        $comboStatus = cmbArray('statusproduk', $statusproduk, $arrayStatus, '-- STATUS --', "");
+        $comboStatus = cmbArray('statusProduk', $statusProduk, $arrayStatus, '-- STATUS --', "");
         $comboKategori = cmbQuery("kategoriProduk",$kategoriProduk,"select id,nama_kategori from ref_kategori","class='form-control'"," -- KATEGORI --");
+        sqlQuery("delete from temp_media_produk where username = '".$_COOKIE['coID']."'");
 
         $fieldInform       .=  $this->newRow(array(
                                 $this->textBoxColumn('Nama Produk','namaProduk',$namaProduk,'12','1','11'),
@@ -269,7 +379,13 @@ class refProdukObj extends configClass
                                 '12','1','11'),
                                ));
         $fieldInform       .=  $this->newRow(array(
-                                $this->customColumn('Media',"<span id='tableMedia>".$this->tempTableMedia($idProduk)."</span>'",'12','1','11'),
+                                $this->customColumn('Media',"<span id='tableMedia'>".$this->tempTableMedia($idProduk)."</span>",'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Harga',"<span id='tableHarga'>".$this->tempTableHarga($idProduk)."</span>",'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Komisi',"<span id='tableKomisi'>".$this->tempTableKomisi($idProduk)."</span>",'12','1','11'),
                               ));
         $fieldInform       .=  $this->newRow(array(
                                $this->textBoxColumn('Berat','beratProduk',$beratProduk,'12','1','11'),
@@ -278,11 +394,11 @@ class refProdukObj extends configClass
                                $this->textBoxColumn('Diskon','diskonProduk',$diskonProduk,'12','1','11'),
                               ));
         $fieldInform       .=  $this->newRow(array(
-                               $this->textBoxColumn('Nama Diskon','namaDiskon',$namaDiskon,'12','1','11'),
+                               $this->textBoxColumn('Nama Promo','namaDiskon',$namaDiskon,'12','1','11'),
                               ));
-        $fieldInform       .=  $this->newRow(array(
-                                $this->customColumn('Cashback',"<span id='spanCashback>".$this->tempTableMedia($idProduk)."</span>'",'12','1','11'),
-                              ));
+        // $fieldInform       .=  $this->newRow(array(
+        //                         $this->customColumn('Cashback',"<span id='spanCashback>".$this->tempTableMedia($idProduk)."</span>'",'12','1','11'),
+        //                       ));
         $fieldInform       .=  $this->newRow(array(
                                 $this->customColumn('Status',$comboStatus,'12','1','11'),
                                ));
@@ -312,7 +428,7 @@ class refProdukObj extends configClass
         $content            = '';
         $json               = TRUE; //$ErrMsg = 'tes';
         $form_name          = $this->Prefix . '_form';
-        $this->ukuran       = 'lg'; // sm as small, md as medium, lg as large, xm as extrasmall , full as fullscreen
+        $this->ukuran       = 'full'; // sm as small, md as medium, lg as large, xm as extrasmall , full as fullscreen
         // $this->form_width   = 600;
         // $this->form_height  = 400;
         $this->form_caption = 'Edit';
@@ -323,43 +439,142 @@ class refProdukObj extends configClass
           array("AKTIF","AKTIF"),
           array("TIDAK AKTIF","TIDAK AKTIF"),
         );
-        $comboStatus = cmbArray('statusproduk', $getDataEdit['status'], $arrayStatus, '-- STATUS --', "");
-        $arrayKategori = array(
-          array("DASHBOARD","DASHBOARD"),
-          array("FUNNEL","FUNNEL"),
-          array("COPYWRITING","COPYWRITING"),
-          array("TRAFIC / LEADS","TRAFIC / LEADS"),
-          array("BILLING","BILLING"),
-        );
-        $comboKategori = cmbArray('kategoriproduk', $getDataEdit['kategori'], $arrayKategori, '-- KATEGORI --', "");
-        $arrayWajibTonton = array(
-          array("WAJIB","WAJIB"),
-          array("TIDAK WAJIB","TIDAK WAJIB"),
-        );
+        $comboStatus = cmbArray('statusProduk', $getDataEdit['status'], $arrayStatus, '-- STATUS --', "");
+        $comboKategori = cmbQuery("kategoriProduk",$getDataEdit['kategori'],"select id,nama_kategori from ref_kategori","class='form-control'"," -- KATEGORI --");
+        sqlQuery("delete from temp_media_produk where username = '".$_COOKIE['coID']."'");
+        $jsonDecodeMedia = json_decode($getDataEdit['media']);
+        for ($i=0; $i < sizeof($jsonDecodeMedia) ; $i++) {
+          $dataTempMedia = array(
+            'username' => $this->userName,
+            'media' => $jsonDecodeMedia[$i]->sourceMedia,
+            'type' => $jsonDecodeMedia[$i]->type,
+          );
+          sqlQuery(sqlInsert("temp_media_produk",$dataTempMedia));
+        }
 
         $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Judul','judulproduk',$getDataEdit['judul'],'12','1','11'),
+                                $this->textBoxColumn('Nama Produk','namaProduk',$getDataEdit['nama_produk'],'12','1','11'),
                                ));
-        $fieldInform       .=  $this->newRow(array(
-                                $this->customColumn('Deskripsi',
-                                 "<div id ='isiContent' class='quill-container' > </div>",
-                                '12','1','11'),
-                               ));
-        $fieldInform       .=  $this->newRow(array(
-                               $this->textBoxColumn('Source Video','sourceVideo',$getDataEdit['source_video'],'12','1','11'),
-                              ));
         $fieldInform       .=  $this->newRow(array(
                                 $this->customColumn('Kategori',$comboKategori,'12','1','11'),
                                ));
         $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Deskripsi',
+                                 "<div id ='deskripsiProduk' class='quill-container' >".base64_decode($getDataEdit['deskripsi'])."</div>",
+                                '12','1','11'),
+                               ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Media',"<span id='tableMedia'>".$this->tempTableMedia($idProduk)."</span>",'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Harga',"<span id='tableHarga'>".$this->tempTableHarga($getDataEdit['id'])."</span>",'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Komisi',"<span id='tableKomisi'>".$this->tempTableKomisi($getDataEdit['id'])."</span>",'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                               $this->textBoxColumn('Berat','beratProduk',$getDataEdit['berat'],'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                               $this->textBoxColumn('Diskon','diskonProduk',$getDataEdit['diskon'],'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                               $this->textBoxColumn('Nama Promo','namaDiskon',$getDataEdit['nama_diskon'],'12','1','11'),
+                              ));
+        // $fieldInform       .=  $this->newRow(array(
+        //                         $this->customColumn('Cashback',"<span id='spanCashback>".$this->tempTableMedia($idProduk)."</span>'",'12','1','11'),
+        //                       ));
+        $fieldInform       .=  $this->newRow(array(
                                 $this->customColumn('Status',$comboStatus,'12','1','11'),
                                ));
-
         $this->form_fields =  "<div class='FilterBar row' style='padding: 1%;margin-top:5px;'>".$fieldInform."</div>";
 
         $this->form_menubawah =
 
         "<input type='button' class='btn btn-success btn-sm' value='Simpan' onclick ='" . $this->Prefix .".saveEdit(".$idEdit[0].")' > ".
+        "<input type='button' class='btn btn-success btn-sm' value='Tutup' onclick ='" . $this->Prefix .".Close()' >"
+
+        ;
+
+        $form    = $this->genForm();
+        $content = $form; //$content = 'content';
+        return array(
+            'cek' => $cek,
+            'err' => $err,
+            'content' => $content
+        );
+    }
+    function showDetail($idEdit)
+    {
+        $cek                = '';
+        $err                = '';
+        $content            = '';
+        $json               = TRUE; //$ErrMsg = 'tes';
+        $form_name          = $this->Prefix . '_form';
+        $this->ukuran       = 'full'; // sm as small, md as medium, lg as large, xm as extrasmall , full as fullscreen
+        // $this->form_width   = 600;
+        // $this->form_height  = 400;
+        $this->form_caption = 'Edit';
+        // $idEdit             = $_REQUEST[$this->Prefix . '_cb'];
+        $getDataEdit = sqlArray(sqlQuery("select * from produk where id = '".$idEdit."'"));
+
+        $arrayStatus = array(
+          array("AKTIF","AKTIF"),
+          array("TIDAK AKTIF","TIDAK AKTIF"),
+        );
+        $comboStatus = cmbArray('statusProduk', $getDataEdit['status'], $arrayStatus, '-- STATUS --', "");
+        $comboKategori = cmbQuery("kategoriProduk",$getDataEdit['kategori'],"select id,nama_kategori from ref_kategori","class='form-control'"," -- KATEGORI --");
+        sqlQuery("delete from temp_media_produk where username = '".$_COOKIE['coID']."'");
+        $jsonDecodeMedia = json_decode($getDataEdit['media']);
+        for ($i=0; $i < sizeof($jsonDecodeMedia) ; $i++) {
+          $dataTempMedia = array(
+            'username' => $this->userName,
+            'media' => $jsonDecodeMedia[$i]->sourceMedia,
+            'type' => $jsonDecodeMedia[$i]->type,
+          );
+          sqlQuery(sqlInsert("temp_media_produk",$dataTempMedia));
+        }
+
+        $fieldInform       .=  $this->newRow(array(
+                                $this->textBoxColumn('Nama Produk','namaProduk',$getDataEdit['nama_produk'],'12','1','11'),
+                               ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Kategori',$comboKategori,'12','1','11'),
+                               ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Deskripsi',
+                                 "<div id ='deskripsiProduk' class='quill-container' >".base64_decode($getDataEdit['deskripsi'])."</div>",
+                                '12','1','11'),
+                               ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Media',"<span id='tableMedia'>".$this->tempTableMedia($idProduk)."</span>",'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Harga',"<span id='tableHarga'>".$this->tempTableHarga($getDataEdit['id'])."</span>",'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Komisi',"<span id='tableKomisi'>".$this->tempTableKomisi($getDataEdit['id'])."</span>",'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                               $this->textBoxColumn('Berat','beratProduk',$getDataEdit['berat'],'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                               $this->textBoxColumn('Diskon','diskonProduk',$getDataEdit['diskon'],'12','1','11'),
+                              ));
+        $fieldInform       .=  $this->newRow(array(
+                               $this->textBoxColumn('Nama Promo','namaDiskon',$getDataEdit['nama_diskon'],'12','1','11'),
+                              ));
+        // $fieldInform       .=  $this->newRow(array(
+        //                         $this->customColumn('Cashback',"<span id='spanCashback>".$this->tempTableMedia($idProduk)."</span>'",'12','1','11'),
+        //                       ));
+        $fieldInform       .=  $this->newRow(array(
+                                $this->customColumn('Status',$comboStatus,'12','1','11'),
+                               ));
+        $this->form_fields =  "<div class='FilterBar row' style='padding: 1%;margin-top:5px;'>".$fieldInform."</div>";
+
+        $this->form_menubawah =
+
+        // "<input type='button' class='btn btn-success btn-sm' value='Simpan' onclick ='" . $this->Prefix .".saveEdit(".$idEdit[0].")' > ".
         "<input type='button' class='btn btn-success btn-sm' value='Tutup' onclick ='" . $this->Prefix .".Close()' >"
 
         ;
@@ -455,6 +670,48 @@ class refProdukObj extends configClass
             'align="left" valign="middle"',
             $nama_produk
         );
+        $getNamaKategori = sqlArray(sqlQuery("select * from ref_kategori where id = '$kategori'"));
+        $Koloms[] = array(
+            'align="left" valign="middle"',
+            $getNamaKategori['nama_kategori']
+        );
+        $Koloms[] = array(
+            'align="right" valign="middle"',
+            $this->numberFormat($harga,0)
+        );
+        $Koloms[] = array(
+            'align="right" valign="middle"',
+            $this->numberFormat($harga_member,0)
+        );
+        $decodeKomisi = json_decode($komisi);
+        $Koloms[] = array(
+            'align="right" valign="middle"',
+            $this->numberFormat($decodeKomisi[0],0)
+        );
+        $Koloms[] = array(
+            'align="right" valign="middle"',
+            $this->numberFormat($decodeKomisi[1],0)
+        );
+        $Koloms[] = array(
+            'align="right" valign="middle"',
+            $this->numberFormat($decodeKomisi[2],0)
+        );
+        $Koloms[] = array(
+            'align="right" valign="middle"',
+            $this->numberFormat($decodeKomisi[3],0)
+        );
+        $Koloms[] = array(
+            'align="right" valign="middle"',
+            $this->numberFormat($berat,0)
+        );
+        $Koloms[] = array(
+            'align="left" valign="middle"',
+            $nama_diskon
+        );
+        $Koloms[] = array(
+            'align="center" valign="middle"',
+            "<input type='button' class='btn btn-success' value='DETAIL' onclick=$this->Prefix.showDetail($id)> "
+        );
 
 
 
@@ -479,11 +736,11 @@ class refProdukObj extends configClass
           array("produk","produk"),
           array("PRODUK","PRODUK"),
         );
-        $comboKategori = cmbArray('filterKategori', $filterKategori, $arrayKategori, '-- KATEGORI --', "");
+        $comboKategori = cmbQuery('filterKategori', $filterKategori, "select id, nama_kategori from ref_kategori","class='form-control'" , '-- KATEGORI --', "");
         // $this->textBoxColumn('title','id','value','col_field','col_label','col_input');
         $fieldInform       .=  $this->newRow(array(
-                                $this->textBoxColumn('Judul','filterJudul',$filterJudul,'4','5','7'),
-                                // $this->textBoxColumn('Isi','filterIsi',$filter,'4','5','7'),
+                                $this->textBoxColumn('Nama Produk','filterNamaProduk',$filterNamaProduk,'4','5','7'),
+                                $this->customColumn('Kategori',$comboKategori,'4','5','7'),
                                ));
                                $arrayStatus = array(
                                  array("AKTIF","AKTIF"),
@@ -492,7 +749,6 @@ class refProdukObj extends configClass
                                $comboStatus = cmbArray('filterStatus', $filterStatus, $arrayStatus, '-- STATUS --', "");
 
        $fieldInform        .=  $this->newRow(array(
-                               $this->customColumn('Kategori',$comboKategori,'4','5','7'),
                                $this->customColumn('Status',$comboStatus,'4','5','7'),
                               ));
 
@@ -541,8 +797,8 @@ class refProdukObj extends configClass
             $$key = $value;
         }
         $arrKondisi = array();
-        if (!empty($filterJudul)) {
-            $arrKondisi[] = "judul_materi like '%$filterJudul%'";
+        if (!empty($filterNamaProduk)) {
+            $arrKondisi[] = "nama_produk like '%$filterNamaProduk%'";
         }
         if (!empty($filterStatus)) {
             $arrKondisi[] = "status ='$filterStatus'";
@@ -640,7 +896,286 @@ class refProdukObj extends configClass
     	}
 
       function tempTableMedia($idProduk){
-        return "";
+        if(!empty($idProduk))$kondisiProduk = " and id_produk = '$idProduk'";
+        $className= "row0";
+        $nomor = 1;
+        $getDataMedia = sqlQuery("select * from temp_media_produk where username = '".$this->userName."' $kondisiProduk");
+        while ($dataMedia = sqlArray($getDataMedia)) {
+          foreach ($dataMedia as $key => $value) {
+              $$key = $value;
+          }
+          $listMedia.= "
+          <tr class='$className'>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>$nomor</td>
+            <td class='GarisDaftar' style='text-align:left;valign:middle;'>$media</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>$type</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>
+            <span id='btnOpsi4910'>
+						<img id='ubah4910' src='images/administrator/images/edit_f2.png' width='20px' heigh='20px' style='cursor : pointer;' onclick=$this->Prefix.editMedia($id)>
+						<img src='images/administrator/images/invalid.png' width='20px' heigh='20px' style='cursor : pointer;' onclick=$this->Prefix.hapusMedia($id)>
+						</span>
+            </td>
+          </tr>
+          ";
+      	  if($nomor % 2 == 1){
+    	   		$className = "row0";
+    	   	}else{
+    	   		$className = "row1";
+    	   	}
+          $nomor+= 1;
+
+        }
+        return "
+        <table class='table table-sm table-striped table-hover' border='1' style='min-width: 100%;border: 1px solid #b0b0b2;' id='tech-companies-1'>
+        <thead>
+    	   <tr style='background: #1094f7;color: white;border-bottom: 2px solid #f55757;'>
+      	   <th class='th01' style='text-align:center;vertical-align:middle;width:1%;'>No.</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:60%;'>SOURCE</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:30%;'>TYPE</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:10%;'>
+            <span id='atasbutton'>
+						 <a href='javascript:$this->Prefix.addMedia($idProduk)' id='linkAtasButton'><img id='gambarAtasButton' src='datepicker/add-256.png' style='width:20px;height:20px;'></a>
+					  </span>
+           </th>
+    	   </tr>
+        </thead>
+        <tbody>
+          ".$listMedia."
+        </tbody>
+
+        </table>
+
+        ";
+      }
+
+      function addMedia(){
+        // if(!empty($idProduk))$kondisiProduk = " and id_produk = '$idProduk'";
+        $className= "row0";
+        $nomor = 1;
+        $getDataMedia = sqlQuery("select * from temp_media_produk where username = '".$this->userName."' $kondisiProduk");
+        while ($dataMedia = sqlArray($getDataMedia)) {
+          foreach ($dataMedia as $key => $value) {
+              $$key = $value;
+          }
+          $listMedia.= "
+          <tr class='$className'>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>$nomor</td>
+            <td class='GarisDaftar' style='text-align:left;valign:middle;'>$media</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>$type</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>
+            <span id='btnOpsi4910'>
+						<img id='ubah4910' src='images/administrator/images/edit_f2.png' width='20px' heigh='20px' style='cursor : pointer;' onclick=$this->Prefix.editMedia($id)>
+						<img src='images/administrator/images/invalid.png' width='20px' heigh='20px' style='cursor : pointer;' onclick=$this->Prefix.hapusMedia($id)>
+						</span>
+            </td>
+          </tr>
+          ";
+          if($nomor % 2 == 1){
+            $className = "row0";
+          }else{
+            $className = "row1";
+          }
+          $nomor+= 1;
+
+        }
+        $arrayType = array(
+          array("GAMBAR","GAMBAR"),
+          array("VIDEO","VIDEO"),
+        );
+        $comboType = cmbArray('typeMedia', $typeMedia, $arrayType, '-- TYPE --', "");
+        return "
+        <table class='table table-sm table-striped table-hover' border='1' style='min-width: 100%;border: 1px solid #b0b0b2;' id='tech-companies-1'>
+        <thead>
+    	   <tr style='background: #1094f7;color: white;border-bottom: 2px solid #f55757;'>
+      	   <th class='th01' style='text-align:center;vertical-align:middle;width:1%;'>No.</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:60%;'>SOURCE</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:30%;'>TYPE</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:10%;'>
+            <span id='atasbutton'>
+						 <a href='javascript:$this->Prefix.addMedia()' id='linkAtasButton'><img id='gambarAtasButton' src='datepicker/add-256.png' style='width:20px;height:20px;'></a>
+					  </span>
+           </th>
+    	   </tr>
+        </thead>
+        <tbody>
+          ".$listMedia."
+          <tr class='$className'>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>$nomor</td>
+            <td class='GarisDaftar' style='text-align:left;valign:middle;'><input type='text' class='form-control' name='sourceMedia' id='sourceMedia' ></td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>$comboType</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>
+            <span id='btnOpsi4910'>
+            <img id='ubah4910' src='datepicker/save.png' width='20px' heigh='20px' style='cursor : pointer;' onclick=$this->Prefix.saveNewMedia()>
+            <img src='images/administrator/images/invalid.png' width='20px' heigh='20px' style='cursor : pointer;' onclick=$this->Prefix.batalMedia()>
+            </span>
+            </td>
+          </tr>
+        </tbody>
+
+        </table>
+
+        ";
+      }
+      function editMedia($idEdit){
+        // if(!empty($idProduk))$kondisiProduk = " and id_produk = '$idProduk'";
+        $className= "row0";
+        $nomor = 1;
+        $getDataMedia = sqlQuery("select * from temp_media_produk where username = '".$this->userName."'");
+        while ($dataMedia = sqlArray($getDataMedia)) {
+          foreach ($dataMedia as $key => $value) {
+              $$key = $value;
+          }
+          if($id == $idEdit){
+            $arrayType = array(
+              array("GAMBAR","GAMBAR"),
+              array("VIDEO","VIDEO"),
+            );
+            $comboType = cmbArray('typeMedia', $type, $arrayType, '-- TYPE --', "");
+            $listMedia.= "
+            <tr class='$className'>
+              <td class='GarisDaftar' style='text-align:center;valign:middle;'>$nomor</td>
+              <td class='GarisDaftar' style='text-align:left;valign:middle;'><input type='text' class='form-control' name='sourceMedia' id='sourceMedia' value='$media' ></td>
+              <td class='GarisDaftar' style='text-align:center;valign:middle;'>$comboType</td>
+              <td class='GarisDaftar' style='text-align:center;valign:middle;'>
+              <span id='btnOpsi4910'>
+              <img id='ubah4910' src='datepicker/save.png' width='20px' heigh='20px' style='cursor : pointer;' onclick=$this->Prefix.saveEditMedia($idEdit)>
+              <img src='images/administrator/images/invalid.png' width='20px' heigh='20px' style='cursor : pointer;' onclick=$this->Prefix.batalMedia()>
+              </span>
+              </td>
+            </tr>
+            ";
+          }else{
+            $listMedia.= "
+            <tr class='$className'>
+              <td class='GarisDaftar' style='text-align:center;valign:middle;'>$nomor</td>
+              <td class='GarisDaftar' style='text-align:left;valign:middle;'>$media</td>
+              <td class='GarisDaftar' style='text-align:center;valign:middle;'>$type</td>
+              <td class='GarisDaftar' style='text-align:center;valign:middle;'>
+              <span id='btnOpsi4910'>
+  						<img id='ubah4910' src='images/administrator/images/edit_f2.png' width='20px' heigh='20px' style='cursor : pointer;' onclick=$this->Prefix.editMedia($id)>
+  						<img src='images/administrator/images/invalid.png' width='20px' heigh='20px' style='cursor : pointer;' onclick=$this->Prefix.hapusMedia($id)>
+  						</span>
+              </td>
+            </tr>
+            ";
+          }
+
+          if($nomor % 2 == 1){
+            $className = "row0";
+          }else{
+            $className = "row1";
+          }
+          $nomor+= 1;
+
+        }
+
+        return "
+        <table class='table table-sm table-striped table-hover' border='1' style='min-width: 100%;border: 1px solid #b0b0b2;' id='tech-companies-1'>
+        <thead>
+    	   <tr style='background: #1094f7;color: white;border-bottom: 2px solid #f55757;'>
+      	   <th class='th01' style='text-align:center;vertical-align:middle;width:1%;'>No.</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:60%;'>SOURCE</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:30%;'>TYPE</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:10%;'>
+            <span id='atasbutton'>
+						 <a href='javascript:$this->Prefix.addMedia()' id='linkAtasButton'><img id='gambarAtasButton' src='datepicker/add-256.png' style='width:20px;height:20px;'></a>
+					  </span>
+           </th>
+    	   </tr>
+        </thead>
+        <tbody>
+          ".$listMedia."
+
+        </tbody>
+
+        </table>
+
+        ";
+      }
+      function tempTableKomisi($idProduk){
+        $className= "row0";
+
+        $arrayType = array(
+          array("GAMBAR","GAMBAR"),
+          array("VIDEO","VIDEO"),
+        );
+        $getDataEdit = sqlArray(sqlQuery("select * from produk where id = '$idProduk'"));
+        $decodeKomisi= json_decode($getDataEdit['komisi']);
+        $comboType = cmbArray('typeMedia', $typeMedia, $arrayType, '-- TYPE --', "");
+        return "
+        <table class='table table-sm table-striped table-hover' border='1' style='min-width: 100%;border: 1px solid #b0b0b2;' id='tech-companies-1'>
+        <thead>
+    	   <tr style='background: #1094f7;color: white;border-bottom: 2px solid #f55757;'>
+      	   <th class='th01' style='text-align:center;vertical-align:middle;width:1%;'>No.</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:30%;'>LEVEL</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:60%;'>KOMISI</th>
+    	   </tr>
+        </thead>
+        <tbody>
+          <tr class='row0'>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>1</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>LEVEL 1</td>
+            <td class='GarisDaftar' style='text-align:left;valign:middle;'><input type='text' class='form-control' name='jumlahKomisiLevel1' id='jumlahKomisiLevel1' value='".$decodeKomisi[0]."' ></td>
+          </tr>
+          <tr class='row1'>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>2</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>LEVEL 2</td>
+            <td class='GarisDaftar' style='text-align:left;valign:middle;'><input type='text' class='form-control' name='jumlahKomisiLevel2' id='jumlahKomisiLevel2' value='".$decodeKomisi[1]."' ></td>
+          </tr>
+          <tr class='row0'>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>3</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>LEVEL 3</td>
+            <td class='GarisDaftar' style='text-align:left;valign:middle;'><input type='text' class='form-control' name='jumlahKomisiLevel3' id='jumlahKomisiLevel3' value='".$decodeKomisi[2]."' ></td>
+          </tr>
+          <tr class='row1'>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>4</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>LEVEL 4</td>
+            <td class='GarisDaftar' style='text-align:left;valign:middle;'><input type='text' class='form-control' name='jumlahKomisiLevel4' id='jumlahKomisiLevel4' value='".$decodeKomisi[3]."' ></td>
+          </tr>
+
+
+        </tbody>
+
+        </table>
+
+        ";
+      }
+      function tempTableHarga($idProduk){
+        $className= "row0";
+        $getDataEdit = sqlArray(sqlQuery("select * from produk where id = '$idProduk'"));
+        $arrayType = array(
+          array("GAMBAR","GAMBAR"),
+          array("VIDEO","VIDEO"),
+        );
+        $comboType = cmbArray('typeMedia', $typeMedia, $arrayType, '-- TYPE --', "");
+        return "
+        <table class='table table-sm table-striped table-hover' border='1' style='min-width: 100%;border: 1px solid #b0b0b2;' id='tech-companies-1'>
+        <thead>
+    	   <tr style='background: #1094f7;color: white;border-bottom: 2px solid #f55757;'>
+      	   <th class='th01' style='text-align:center;vertical-align:middle;width:1%;'>No.</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:30%;'>LEVEL</th>
+    		   <th class='th01' style='text-align:center;vertical-align:middle;width:60%;'>HARGA</th>
+    	   </tr>
+        </thead>
+        <tbody>
+          <tr class='row0'>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>1</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>UMUM</td>
+            <td class='GarisDaftar' style='text-align:left;valign:middle;'><input type='text' class='form-control' name='hargaUmum' id='hargaUmum' value='".$getDataEdit['harga']."' ></td>
+          </tr>
+          <tr class='row1'>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>2</td>
+            <td class='GarisDaftar' style='text-align:center;valign:middle;'>MEMBER</td>
+            <td class='GarisDaftar' style='text-align:left;valign:middle;'><input type='text' class='form-control' name='hargaMember' id='hargaMember' value='".$getDataEdit['harga_member']."' ></td>
+          </tr>
+
+
+
+        </tbody>
+
+        </table>
+
+        ";
       }
 
 }

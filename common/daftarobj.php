@@ -487,7 +487,7 @@ function createDialog($fmID='divdialog1',
 		$dlg =
 			dialog_createCaption($caption, $dlgCaptionContent).
 			"<div id='$fmID' style='margin:$marginTop $marginLeft $marginBottom $marginRight;
-				height:500px; border:1px solid #E5E5E5;overflow: auto;overflow-x: hidden;'
+				height:90%; border:1px solid #E5E5E5;overflow: auto;overflow-x: hidden;'
 			>".
 			$Content.
 			'</div>'.

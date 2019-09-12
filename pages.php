@@ -108,6 +108,28 @@ if (CekLogin () == false){
 				}
 				break;
 			}
+			case 'modulTransaksi':{
+				if (CekLogin()) {  setLastAktif();
+					include('common/daftarobj.php');
+					include('common/configClass.php');
+					include("pages/modulTransaksi/modulTransaksi.php");
+					$modulTransaksi->selector();
+				}else{
+					header("Location:index.php?");
+				}
+				break;
+			}
+			case 'modulOmset':{
+				if (CekLogin()) {  setLastAktif();
+					include('common/daftarobj.php');
+					include('common/configClass.php');
+					include("pages/modulOmset/modulOmset.php");
+					$modulOmset->selector();
+				}else{
+					header("Location:index.php?");
+				}
+				break;
+			}
 
 	}
 

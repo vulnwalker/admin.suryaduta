@@ -1,8 +1,8 @@
-var refProduk = new DaftarObj2({
-  prefix: "refProduk",
-  url: "pages.php?Pg=refProduk",
-  formName: "refProdukForm",
-  refProduk_form: "0", //default js refProduk
+var modulTransaksi = new DaftarObj2({
+  prefix: "modulTransaksi",
+  url: "pages.php?Pg=modulTransaksi",
+  formName: "modulTransaksiForm",
+  modulTransaksi_form: "0", //default js modulTransaksi
   loading: function() {
     //alert('loading');
     this.topBarRender();
@@ -109,7 +109,7 @@ var refProduk = new DaftarObj2({
       alert(errmsg);
     }
   },
-  Edit: function() {
+  Konfirmasi: function() {
     var me = this;
     errmsg = this.CekCheckbox();
     if (errmsg == "") {
@@ -121,7 +121,7 @@ var refProduk = new DaftarObj2({
       $.ajax({
         type: "POST",
         data: $("#" + this.formName).serialize(),
-        url: this.url + "&tipe=Edit",
+        url: this.url + "&tipe=Konfirmasi",
         success: function(data) {
           var resp = eval("(" + data + ")");
           if (resp.err == "") {
@@ -211,28 +211,7 @@ var refProduk = new DaftarObj2({
       alert(errmsg);
     }
   },
-  saveKonfirmasi: function(idPenjualan) {
-    var me = this;
-    this.OnErrorClose = false;
-    document.body.style.overflow = "hidden";
-    var cover = this.prefix + "_formsimpan";
-    addCoverPage2(cover, 999999, true, false);
-    $.ajax({
-      type: "POST",
-      data: $("#" + this.prefix + "_form").serialize()+"&idPenjualan="+idPenjualan,
-      url: this.url + "&tipe=saveKonfirmasi",
-      success: function(data) {
-        var resp = eval("(" + data + ")");
-        delElem(cover);
-        if (resp.err == "") {
-          me.Close();
-          me.refreshList();
-        } else {
-          alert(resp.err);
-        }
-      }
-    });
-  },
+
   saveNew: function() {
     var me = this;
     this.OnErrorClose = false;
@@ -255,7 +234,7 @@ var refProduk = new DaftarObj2({
       }
     });
   },
-  saveEdit: function(idEdit) {
+  saveKonfirmasi: function(idEdit) {
     var me = this;
     this.OnErrorClose = false;
     document.body.style.overflow = "hidden";
@@ -263,8 +242,8 @@ var refProduk = new DaftarObj2({
     addCoverPage2(cover, 9999, true, false);
     $.ajax({
       type: "POST",
-      data: $("#" + this.prefix + "_form").serialize()+"&idEdit="+idEdit+"&deskripsiProduk="+$("#deskripsiProduk").html(),
-      url: this.url + "&tipe=saveEdit",
+      data: $("#" + this.prefix + "_form").serialize()+"&idEdit="+idEdit,
+      url: this.url + "&tipe=saveKonfirmasi",
       success: function(data) {
         var resp = eval("(" + data + ")");
         delElem(cover);
